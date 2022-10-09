@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>600</height>
+    <width>1154</width>
+    <height>681</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="btnClose">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>450</y>
+      <x>370</x>
+      <y>580</y>
       <width>251</width>
       <height>25</height>
      </rect>
@@ -31,11 +31,22 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>40</y>
-      <width>721</width>
-      <height>271</height>
+      <y>10</y>
+      <width>391</width>
+      <height>541</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>439</x>
+      <y>10</y>
+      <width>681</width>
+      <height>541</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="graph"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -43,7 +54,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>1154</width>
      <height>22</height>
     </rect>
    </property>
@@ -51,10 +62,16 @@
     <property name="title">
      <string>Меню</string>
     </property>
+    <addaction name="actionOpenFile"/>
    </widget>
    <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpenFile">
+   <property name="text">
+    <string>Открыть файл</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
