@@ -41,6 +41,9 @@ class PdTable(QAbstractTableModel):
         return None
 
 
+
+
+
 class mainApp(QMainWindow):
 
     def __init__(self):
@@ -54,8 +57,25 @@ class mainApp(QMainWindow):
         self.figure.tight_layout()
         self.graph.addWidget(self.canvas)
         self.ax = self.figure.subplots(1, 1)
-        #self.viewData()
+       # self.viewData("data/BTCUSDT_1d_1502928000000-1589241600000_86400000_1000.csv")
         self.actionOpenFile.triggered.connect(self.onOpenFile)
+        cid = self.canvas.mpl_connect('button_press_event', self.onclick_canvas)
+        cid2 = self.canvas.mpl_connect('button_release_event', self.onnonclick_canvas)
+        self.period = lib1.prognoz_period()
+
+    def onclick_canvas(self, event):
+        print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+              ('double' if event.dblclick else 'single', event.button,
+               event.x, event.y, event.xdata, event.ydata))
+        self.period.change_begin_period(event.xdata)
+
+    def onnonclick_canvas(self, event):
+        print('%s non click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+              ('double' if event.dblclick else 'single', event.button,
+               event.x, event.y, event.xdata, event.ydata))
+        self.period.change_begin_perid(event.xdata)
+        self.textBegin.setText(self.period.get_data_format_begin())
+        self.textEndTime.setText(self.period.get_data_fromat_end())
 
     def createMenus(self):
         menubar = self.menuBar()
@@ -65,17 +85,11 @@ class mainApp(QMainWindow):
         if file:
            self.viewData(file[0])
 
-    def viewData(self, file = "data/BTCUSDT_1d_1502928000000-1589241600000_86400000_1000.csv" ):
-        # data = {'Пол': ['мужской', 'женский', 'женский', 'мужской', 'мужской'],
-        #         'Имя': ['Сяо Мин', 'Сяо Хун', 'Сяо Фан', 'Сяо Цян', 'Сяо Мэй'],
-        #         "Возраст": [20, 21, 25, 24, 29]
-        #         }
-        #
-        # df = pd.DataFrame(data, index=['No.1', 'No.2', 'No.3', 'No.4', 'No.5'],
-        #                   columns=['Имя', 'Пол', 'Возраст', 'Род занятий'])
+    def viewData(self, file = "data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv" ):
 
-        #df = lib1.open_data("data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv")
+        #cid = self.canvas.mpl_connect('button_press_event', onclick_canvas)
         df = lib1.open_data(file)
+        df["date"] = df.index
         if len(df):
             model = PdTable(df)
             view = self.tableView
@@ -84,6 +98,7 @@ class mainApp(QMainWindow):
             view.setAlternatingRowColors(True)
             view.show()
             lib1.draw_data(df, self.ax)
+            self.textBegin
 
 
 
@@ -92,6 +107,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     window = mainApp()
-   # window.viewData()
+    window.viewData()
     window.show()
     app.exec_()

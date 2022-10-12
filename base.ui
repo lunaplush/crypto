@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1154</width>
-    <height>681</height>
+    <height>871</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="btnClose">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>580</y>
+      <x>440</x>
+      <y>770</y>
       <width>251</width>
       <height>25</height>
      </rect>
@@ -32,7 +32,7 @@
      <rect>
       <x>30</x>
       <y>10</y>
-      <width>391</width>
+      <width>311</width>
       <height>541</height>
      </rect>
     </property>
@@ -40,13 +40,46 @@
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>439</x>
+      <x>359</x>
       <y>10</y>
-      <width>681</width>
+      <width>761</width>
       <height>541</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="graph"/>
+   </widget>
+   <widget class="QLineEdit" name="textBegin">
+    <property name="geometry">
+     <rect>
+      <x>400</x>
+      <y>590</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="textEndTime">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>590</y>
+      <width>113</width>
+      <height>25</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnRefresh">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>590</y>
+      <width>151</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Перерисовать</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
