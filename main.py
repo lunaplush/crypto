@@ -9,7 +9,7 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-
+import matplotlib.dates as mdates
 
 import lib1
 
@@ -63,7 +63,12 @@ class mainApp(QMainWindow):
         self.actionOpenFile.triggered.connect(self.onOpenFile)
         cid = self.canvas.mpl_connect('button_press_event', self.onclick_canvas)
         cid2 = self.canvas.mpl_connect('button_release_event', self.onnonclick_canvas)
+      # self.df = None
         self.period = lib1.prognoz_period()
+        self.btnRefresh.clicked.connect(self.changePeriod)
+        self.btnFullPeriod.clicked.connect(self.returnFullPeriod)
+
+
 
     def onclick_canvas(self, event):
         print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
@@ -90,18 +95,32 @@ class mainApp(QMainWindow):
     def viewData(self, file = "data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv" ):
 
         #cid = self.canvas.mpl_connect('button_press_event', onclick_canvas)
-        df = lib1.open_data(file)
-        df["date"] = df.index
-        if len(df):
-            model = PdTable(df)
+        self.df = lib1.open_data(file)
+        self.df["date"] = self.df.index
+        if len(self.df):
+            model = PdTable(self.df)
             view = self.tableView
             view.setModel(model)
             view.setWindowTitle('Pandas')
             view.setAlternatingRowColors(True)
             view.show()
-            lib1.draw_data(df, self.ax)
+            lib1.draw_data(self.df, self.ax)
             self.textBegin
+        self.period.change_begin_period(mdates.date2num(self.df.index[0]))
+        self.period.change_end_period(mdates.date2num(self.df.index[-1]))
+        self.textBegin.setText(self.period.get_data_format_begin())
+        self.textEndTime.setText(self.period.get_data_fromat_end())
 
+    def changePeriod(self):
+
+        lib1.draw_data(self.df[self.period.begin:self.period.end], self.ax)
+
+    def returnFullPeriod(self):
+        lib1.draw_data(self.df, self.ax)
+        self.period.change_begin_period(mdates.date2num(self.df.index[0]))
+        self.period.change_end_period(mdates.date2num(self.df.index[-1]))
+        self.textBegin.setText(self.period.get_data_format_begin())
+        self.textEndTime.setText(self.period.get_data_fromat_end())
 
 
 

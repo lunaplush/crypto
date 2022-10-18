@@ -42,6 +42,7 @@ def draw_data(df, ax):
     ax.figure.canvas.show()
 
 
+
 class prognoz_period():
     def __init__(self, b = 0):
         self.begin = b
