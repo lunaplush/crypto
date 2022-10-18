@@ -3,6 +3,8 @@ import datetime
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
+import matplotlib.dates as mdates
 import time
 NORM_CONST = pow(10, 10)
 def convert_to_float(name):
@@ -26,14 +28,16 @@ def open_data(path):
         return []
 def draw_data(df, ax):
     ax.clear()
+
     ndf = df.resample('W').median()
-    ndf.price.plot()
-   # ax.plot(df.index, df.price)
+    #ndf.price.plot(x="timestamp", style=".-")
+    ax.plot(mdates.date2num(ndf.index), ndf.price)
     n = len(df.price)
-    #lb = [a for a in df.data[0:n:99]]
-   # ax.set_xticks(np.linspace(0, n, len(lb)), lb, rotation="vertical")
+    lb = [a.strftime("%Y/%m/%d") for a in ndf.index[0:n:10]]
+    ax.set_xticks(ndf.index[0:n:10], lb, rotation="vertical")
     lb = ["{:.0f}".format(i) for i in np.linspace(df.price.min(), df.price.max(), 34)]
     ax.set_yticks(np.linspace(df.price.min(), df.price.max(), 34), lb, rotation="horizontal")
+    #ax.figure.tight_layout()
     ax.figure.canvas.draw()
     ax.figure.canvas.show()
 
@@ -43,18 +47,18 @@ class prognoz_period():
         self.begin = b
         self.end = b
 
-    def change_begin_perid(self, b):
-        self.begin = b
+    def change_begin_period(self, b):
+        self.begin = mdates.num2date(b)
 
     def change_end_period(self, e):
-        self.end = e
+        self.end = mdates.num2date(e)
 
     def change_period(self, b, e):
         self.change_begin_perid(b)
         self.change_end_period(e)
 
     def conv_to_data(self, data):
-        return datetime.datetime.fromtimestamp(data).strftime(format="%Y/%m/%d")
+        return data.strftime("%Y/%m/%d")
 
     def get_data_format_begin(self):
         return self.conv_to_data(self.begin)

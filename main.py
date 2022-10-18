@@ -9,6 +9,8 @@ import os
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
+
+
 import lib1
 
 
@@ -73,7 +75,7 @@ class mainApp(QMainWindow):
         print('%s non click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
               ('double' if event.dblclick else 'single', event.button,
                event.x, event.y, event.xdata, event.ydata))
-        self.period.change_begin_perid(event.xdata)
+        self.period.change_end_period(event.xdata)
         self.textBegin.setText(self.period.get_data_format_begin())
         self.textEndTime.setText(self.period.get_data_fromat_end())
 
