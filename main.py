@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, qApp, QMessageBox, QTableView
 from PyQt5.QtCore import QAbstractTableModel, Qt, QCoreApplication
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt5 import uic
 import sys
@@ -12,6 +13,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.dates as mdates
 
 import lib1
+import lib2
 
 
 class PdTable(QAbstractTableModel):
@@ -83,6 +85,7 @@ class mainApp(QMainWindow):
         self.period.change_end_period(event.xdata)
         self.textBegin.setText(self.period.get_data_format_begin())
         self.textEndTime.setText(self.period.get_data_fromat_end())
+        self.btnLinReg.setDisabled(False)
 
     def createMenus(self):
         menubar = self.menuBar()
@@ -106,6 +109,7 @@ class mainApp(QMainWindow):
             view.show()
             lib1.draw_data(self.df, self.ax)
             self.textBegin
+            #self.graphicsView.setModel(model)
         self.period.change_begin_period(mdates.date2num(self.df.index[0]))
         self.period.change_end_period(mdates.date2num(self.df.index[-1]))
         self.textBegin.setText(self.period.get_data_format_begin())
@@ -122,6 +126,14 @@ class mainApp(QMainWindow):
         self.textBegin.setText(self.period.get_data_format_begin())
         self.textEndTime.setText(self.period.get_data_fromat_end())
 
+    def doLinearRegression(self):
+        self.figure = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
+        self.canvas = FigureCanvas(self.figure)
+        self.ResultLayout.addWidget(self.canvas)
+        self.ax = self.figure.subplots(1,1)
+        ts = lib2.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
+        ts.plot_linear_regression(self.ax)
+        self.ax.figure.canvas.draw()
 
 
 if __name__ == '__main__':

@@ -1,3 +1,4 @@
+# работа с данными
 import datetime
 
 import pandas as pd
@@ -29,7 +30,8 @@ def open_data(path):
 def draw_data(df, ax):
     ax.clear()
 
-    ndf = df.resample('W').median()
+    #ndf = df.resample('W').median()
+    ndf = df
     #ndf.price.plot(x="timestamp", style=".-")
     ax.plot(mdates.date2num(ndf.index), ndf.price)
     n = len(df.price)
@@ -44,9 +46,16 @@ def draw_data(df, ax):
 
 
 class prognoz_period():
-    def __init__(self, b = 0):
+    def __init__(self, b=0, e=0):
+
+        assert (isinstance(b, int) and b == 0) or (isinstance(b, datetime.datetime))
         self.begin = b
-        self.end = b
+        if e == 0:
+            self.end = b
+        else:
+            assert isinstance(b, datetime.datetime) and isinstance(e, datetime.datetime), "Задана конечная дата, но не задана начальная дата"
+            assert e > b, "Некорректно задана период, конец раньше начала"
+            self.end = e
 
     def change_begin_period(self, b):
         self.begin = mdates.num2date(b)
