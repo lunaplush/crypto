@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, qApp, QMessageBox, QTableView
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, qApp, QMessageBox, QTableView, QVBoxLayout
 from PyQt5.QtCore import QAbstractTableModel, Qt, QCoreApplication
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
@@ -69,6 +69,7 @@ class mainApp(QMainWindow):
         self.period = lib1.prognoz_period()
         self.btnRefresh.clicked.connect(self.changePeriod)
         self.btnFullPeriod.clicked.connect(self.returnFullPeriod)
+        self.btnLinReg.clicked.connect(self.doLinearRegression)
 
 
 
@@ -127,14 +128,17 @@ class mainApp(QMainWindow):
         self.textEndTime.setText(self.period.get_data_fromat_end())
 
     def doLinearRegression(self):
+        resVisual = QVBoxLayout()
+        self.frame.setLayout(resVisual)
         self.figure = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
         self.canvas = FigureCanvas(self.figure)
-        self.ResultLayout.addWidget(self.canvas)
+        resVisual.addWidget(self.canvas)
         self.ax = self.figure.subplots(1,1)
         ts = lib2.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
-        ts.plot_linear_regression(self.ax)
-        self.ax.figure.canvas.draw()
+        ts.plot_linear_regression(ts, self.ax)
 
+       # self.ax.figure.canvas.draw()
+        self.frame.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

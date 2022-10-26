@@ -30,15 +30,16 @@ class TimeSeriesPrediction():
         self.lin_regression.fit(self.get_index_as_array(), self.get_column_as_array())
         return np.array([self.lin_regression.intercept_, self.lin_regression.coef_[0]])
 
-    def plot_linear_regression(self, ax):
+    def plot_linear_regression(self, ts, ax):
+
         x = ts.get_index_as_array()
         y = ts.get_column_as_array()
         X = np.c_[np.ones((x.shape[0], 1)), x]
 
         x1 = np.array([x[0], x[-1]])
         x11 = np.c_[np.ones((2, 1)), x1]
-        ax.xlabel("$x_1$", fontsize=10)
-        ax.ylabel("$y$", rotation=0, fontsize=10)
+        ax.set_xlabel("$x_1$", fontsize=10)
+        ax.set_ylabel("$y$", rotation=0, fontsize=10)
         W2 = ts.predict_linear_regression()
         ax.plot(x1, x11.dot(W2), "m-")
 
