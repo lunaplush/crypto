@@ -130,14 +130,16 @@ class mainApp(QMainWindow):
     def doLinearRegression(self):
         resVisual = QVBoxLayout()
         self.frame.setLayout(resVisual)
-        self.figure = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
-        self.canvas = FigureCanvas(self.figure)
-        resVisual.addWidget(self.canvas)
-        self.ax = self.figure.subplots(1,1)
+        self.figure2 = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
+        self.canvas2 = FigureCanvas(self.figure2)
+        resVisual.addWidget(self.canvas2)
+        self.ax2 = self.figure2.subplots(1,1)
         ts = lib2.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
         ts.plot_linear_regression(ts, self.ax)
+        ts.plot_linear_regression(ts, self.ax2)
+        self.ax.figure.canvas.draw()
+        self.ax2.figure.canvas.draw()
 
-       # self.ax.figure.canvas.draw()
         self.frame.show()
 
 if __name__ == '__main__':
