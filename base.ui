@@ -115,7 +115,7 @@
      <rect>
       <x>30</x>
       <y>560</y>
-      <width>331</width>
+      <width>311</width>
       <height>261</height>
      </rect>
     </property>
@@ -124,6 +124,19 @@
     </property>
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btnArima">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>660</y>
+      <width>191</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>ARIMA</string>
     </property>
    </widget>
   </widget>
