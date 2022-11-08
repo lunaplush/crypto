@@ -1,0 +1,2 @@
+model:                                       # Params of the model defined in src/model.py
+  path_to_model: models/logit_tfidf_btc_sentiment.pkl
