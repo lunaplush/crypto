@@ -1,4 +1,5 @@
 # В библиотеке будут собраны функции NLP для определения настроения новости.
+#https://github.com/crypto-sentiment/crypto_sentiment_tfidf_logreg_streamlit
 import sqlite3
 import pandas as pd
 import yaml
@@ -7,6 +8,8 @@ from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+
+from transformers import TextClassificationPipeline, AutoModelForSequenceClassification, AutoTokenizer
 
 """
 0 - Negative
@@ -24,7 +27,17 @@ def load_model(model_path):
         model = pickle.load(f)
     return model
 
-
+def mod_BERT_result(b):
+    b1 = {}
+    for i in b[0]:
+        if i["label"] == 'Neutral':
+            k = 1
+        if i["label"] == "Bullish":
+            k = 2
+        if i["label"] == "Bearish":
+            k = 0
+        b1[k] = i["score"]
+    return b1
 def model_inference(model, input_text):
 
     pred = model.predict_proba([input_text])
@@ -50,8 +63,16 @@ if __name__=="__main__":
     with open(str(project_root / "config.yml")) as f:
         params = yaml.load(f, Loader=yaml.FullLoader)
     model = load_model(params["model"]["path_to_model"])
+
+    model_name = "ElKulako/cryptobert"
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+    model2 = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
+    pipe = TextClassificationPipeline(model=model2, tokenizer=tokenizer, max_length=64,
+                                      truncation=True, padding='max_length', top_k=None)
+
     df = get_news()
 
     for i in df.iterrows():
         a = model_inference(model, i[1].title)
-        print(i[0],"\t",  i[1].title, "\t", a)
+        b =  pipe(i[1].title)
+        print(i[0], "\t",  i[1].title, "\t", a, "\t", mod_BERT_result(b))
