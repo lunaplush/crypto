@@ -57,11 +57,20 @@ class prognoz_period():
             assert e > b, "Некорректно задана период, конец раньше начала"
             self.end = e
 
-    def change_begin_period(self, b):
-        self.begin = mdates.num2date(b)
+    def change_begin_period(self, b, type="num"):
+        if type == "num":
+            self.begin = mdates.num2date(b)
+        if type == "str":
+            y, m, d = map(int, b.split("/"))
+            self.begin = datetime.datetime(year=y, month=m, day=d)
 
-    def change_end_period(self, e):
-        self.end = mdates.num2date(e)
+    def change_end_period(self, e, type="num"):
+        if type == "num":
+            self.end = mdates.num2date(e)
+        if type == "str":
+            y, m, d = map(int, e.split("/"))
+            self.end = datetime.datetime(year=y, month=m, day=d)
+
 
     def change_period(self, b, e):
         self.change_begin_perid(b)

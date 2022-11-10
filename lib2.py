@@ -7,6 +7,8 @@ from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from pandas.plotting import autocorrelation_plot
+from pmdarima.arima import auto_arima, ADFTest
+
 
 
 import statsmodels
@@ -48,17 +50,18 @@ class TimeSeriesPrediction():
         pass
 
     def plot_arima(self, ts, ax):
+        #https://towardsdatascience.com/time-series-forecasting-using-auto-arima-in-python-bb83e49210cd
         x = ts.get_index_as_array()
         y = ts.get_column_as_array()
-        X = np.c_[np.ones((x.shape[0], 1)), x]
 
-        x1 = np.array([x[0], x[-1]])
-        x11 = np.c_[np.ones((2, 1)), x1]
         ax.set_xlabel("$x_1$", fontsize=10)
         ax.set_ylabel("$y$", rotation=0, fontsize=10)
-        autocorrelation_plot(self.df, ax)
+        diki_fuller = ADFTest(alpha=0.05)
+        (pvalue, flag) = diki_fuller.should_diff(self.df.price)
+        print(pvalue, flag)
+       # autocorrelation_plot(self.df, ax)
 
-        ax.plot(x1, x11.dot(W2), "m-")
+
 
 if __name__ == "__main__":
     df = lib1.open_data("data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv")

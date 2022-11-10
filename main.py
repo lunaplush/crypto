@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, qApp, QMessa
 from PyQt5.QtCore import QAbstractTableModel, Qt, QCoreApplication
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from PyQt5 import uic
+from PyQt5 import uic, QtCore
 import sys
 import os
 import matplotlib.pyplot as plt
@@ -58,9 +58,10 @@ class mainApp(QMainWindow):
         self.figure = plt.figure(figsize=(30, 20), facecolor="#FFFFFF")
         #self.figure.tight_layout()
         self.canvas = FigureCanvas(self.figure)
-        self.figure.tight_layout()
+        #self.figure.tight_layout()
         self.graph.addWidget(self.canvas)
         self.ax = self.figure.subplots(1, 1)
+        self.canvas.figure.set_constrained_layout("constrained")
        # self.viewData("data/BTCUSDT_1d_1502928000000-1589241600000_86400000_1000.csv")
         self.actionOpenFile.triggered.connect(self.onOpenFile)
         cid = self.canvas.mpl_connect('button_press_event', self.onclick_canvas)
@@ -73,6 +74,28 @@ class mainApp(QMainWindow):
         self.btnArima.clicked.connect(self.doArima)
 
 
+        self.set_perioud_list()
+
+
+
+    def set_perioud_list(self):
+        slm = QtCore.QStringListModel()
+        slm.insertRows(0, 4)
+        slm.setData(slm.index(0), "2022/08/20 2022/10/01")
+        slm.setData(slm.index(1), "2022/06/22 2022/10/08")
+        slm.setData(slm.index(2), "2021/11/11 2022/10/15")
+        self.lstPeriod.setModel(slm)
+        self.lstPeriod.clicked.connect(self.set_period_from_items)
+
+    def set_period_from_items(self):
+        elem = self.lstPeriod.currentIndex()
+        (b, e) = elem.data().split()
+        self.period.change_begin_period(b, type="str")
+        self.period.change_end_period(e, type="str")
+
+        self.textBegin.setText(self.period.get_data_format_begin())
+        self.textEndTime.setText(self.period.get_data_fromat_end())
+        self.btnLinReg.setDisabled(False)
 
     def onclick_canvas(self, event):
         print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %

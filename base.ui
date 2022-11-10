@@ -100,9 +100,9 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>400</x>
+      <x>350</x>
       <y>660</y>
-      <width>281</width>
+      <width>221</width>
       <height>25</height>
      </rect>
     </property>
@@ -129,7 +129,7 @@
    <widget class="QPushButton" name="btnArima">
     <property name="geometry">
      <rect>
-      <x>710</x>
+      <x>580</x>
       <y>660</y>
       <width>191</width>
       <height>25</height>
@@ -137,6 +137,16 @@
     </property>
     <property name="text">
      <string>ARIMA</string>
+    </property>
+   </widget>
+   <widget class="QListView" name="lstPeriod">
+    <property name="geometry">
+     <rect>
+      <x>800</x>
+      <y>630</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
     </property>
    </widget>
   </widget>
