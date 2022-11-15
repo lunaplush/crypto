@@ -132,3 +132,5 @@ xarray-einstats==0.3.0
 xlrd==2.0.1
 zope.event==4.5.0
 zope.interface==5.4.0
+pyTelegramBotAPI==4.7.1
+python-dotenv==0.21.0
