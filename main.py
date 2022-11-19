@@ -98,18 +98,37 @@ class mainApp(QMainWindow):
         self.btnLinReg.setDisabled(False)
 
     def onclick_canvas(self, event):
-        print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-              ('double' if event.dblclick else 'single', event.button,
-               event.x, event.y, event.xdata, event.ydata))
-        self.period.change_begin_period(event.xdata)
+        self.clickPos = event.xdata
+        if event.xdata is None:
+            print('%s click: button=%d, x=%d, y=%d, outside canvas' %
+                  ('double' if event.dblclick else 'single', event.button,
+                   event.x, event.y))
+        else:
+            print('%s click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+                  ('double' if event.dblclick else 'single', event.button,
+                   event.x, event.y, event.xdata, event.ydata))
 
     def onnonclick_canvas(self, event):
-        print('%s non click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
-              ('double' if event.dblclick else 'single', event.button,
-               event.x, event.y, event.xdata, event.ydata))
-        self.period.change_end_period(event.xdata)
-        self.textBegin.setText(self.period.get_data_format_begin())
+        if event.xdata is None:
+            print('%s non click: button=%d, x=%d, y=%d, outside canvas' %
+                  ('double' if event.dblclick else 'single', event.button,
+                   event.x, event.y))
+        else:
+            print('%s non click: button=%d, x=%d, y=%d, xdata=%f, ydata=%f' %
+                  ('double' if event.dblclick else 'single', event.button,
+                   event.x, event.y, event.xdata, event.ydata))
+        bPos = self.clickPos
+        ePos = event.xdata
+        if bPos is None:
+            if ePos is None:
+                return
+            bPos = ePos
+        elif ePos is None:
+            ePos = bPos
+        self.period.change_begin_period(bPos)
+        self.period.change_end_period(ePos)
         self.textEndTime.setText(self.period.get_data_fromat_end())
+        self.textBegin.setText(self.period.get_data_format_begin())
         self.btnLinReg.setDisabled(False)
 
     def createMenus(self):

@@ -59,16 +59,20 @@ class prognoz_period():
             self.end = e
 
     def change_begin_period(self, b, type="num"):
-        if type == "num":
+        if b is None:
+            self.begin = None
+        elif type == "num":
             self.begin = mdates.num2date(b)
-        if type == "str":
+        elif type == "str":
             y, m, d = map(int, b.split("/"))
             self.begin = datetime.datetime(year=y, month=m, day=d)
 
     def change_end_period(self, e, type="num"):
-        if type == "num":
+        if e is None:
+            self.end = None
+        elif type == "num":
             self.end = mdates.num2date(e)
-        if type == "str":
+        elif type == "str":
             y, m, d = map(int, e.split("/"))
             self.end = datetime.datetime(year=y, month=m, day=d)
 
