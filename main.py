@@ -125,6 +125,8 @@ class mainApp(QMainWindow):
             bPos = ePos
         elif ePos is None:
             ePos = bPos
+        elif bPos > ePos:
+            bPos, ePos = ePos, bPos
         self.period.change_begin_period(bPos)
         self.period.change_end_period(ePos)
         self.textEndTime.setText(self.period.get_data_fromat_end())
