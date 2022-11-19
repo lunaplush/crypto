@@ -55,7 +55,7 @@ class prognoz_period():
             self.end = b
         else:
             assert isinstance(b, datetime.datetime) and isinstance(e, datetime.datetime), "Задана конечная дата, но не задана начальная дата"
-            assert e > b, "Некорректно задана период, конец раньше начала"
+            assert e > b, "Некорректно задан период, конец раньше начала"
             self.end = e
 
     def change_begin_period(self, b, type="num"):

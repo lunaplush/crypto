@@ -74,11 +74,11 @@ class mainApp(QMainWindow):
         self.btnArima.clicked.connect(self.doArima)
 
 
-        self.set_perioud_list()
+        self.set_period_list()
 
 
 
-    def set_perioud_list(self):
+    def set_period_list(self):
         slm = QtCore.QStringListModel()
         slm.insertRows(0, 4)
         slm.setData(slm.index(0), "2022/08/20 2022/10/01")
