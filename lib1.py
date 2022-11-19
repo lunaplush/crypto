@@ -35,8 +35,9 @@ def draw_data(df, ax):
     #ndf.price.plot(x="timestamp", style=".-")
     ax.plot(mdates.date2num(ndf.index), ndf.price)
     n = len(df.price)
-    lb = [a.strftime("%Y/%m/%d") for a in ndf.index[0:n:10]]
-    ax.set_xticks(ndf.index[0:n:10], lb, rotation="vertical")
+    step_by_date = n // 50 + 1
+    lb = [a.strftime("%Y/%m/%d") for a in ndf.index[0:n:step_by_date]]
+    ax.set_xticks(ndf.index[0:n:step_by_date], lb, rotation="vertical")
     lb = ["{:.0f}".format(i) for i in np.linspace(df.price.min(), df.price.max(), 34)]
     ax.set_yticks(np.linspace(df.price.min(), df.price.max(), 34), lb, rotation="horizontal")
     #ax.figure.tight_layout()
