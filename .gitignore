@@ -3,6 +3,9 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+# Directory for bytecode cacbe files
+__pycache__/
+
 # Node artifact files
 node_modules/
 dist/
