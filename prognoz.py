@@ -16,7 +16,7 @@ ma = np.r_[1, 0]
 
 ar1_data = smtsa.arma_generate_sample(ar = ar, ma = ma, nsample = n )
 ar1_data = df['price']
-#ar1_data = df['price_diff']
+ar1_data = df['price_diff']
 fig, axs = plt.subplot_mosaic(
     """
     FF
