@@ -22,7 +22,7 @@ def open_data(path):
     try:
         #df = pd.read_csv(path, index_col=['timestamp'], parse_dates=['price'])
         #df["price"] = df["price"].apply(convert_to_float)
-        df = pd.read_csv(path, dtype={"price": np.float64, "volume":np.float64}, index_col=['timestamp'], parse_dates=["timestamp"], dayfirst=True)
+        df = pd.read_csv(path, dtype={"price": np.float64, "volume": np.float64}, index_col=['timestamp'], parse_dates=["timestamp"], dayfirst=True)
         df["data"] = df.index.date
         return df
     except:
