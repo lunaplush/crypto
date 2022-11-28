@@ -2,8 +2,10 @@ import telebot
 import config
 from sqlighter import SQLighter
 from telebot import types
-from datetime import datetime
+from datetime import datetime, timedelta
 import trends
+import dateconterter
+import os
 
 NEWS_LIMIT = 10
 #keyword = ''
@@ -111,16 +113,78 @@ def get_news(keyword, limit, start_position):
 
 
 #trends ===========================================
+def menuTrendsSelectPeriod():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup.add('/7d', '/1m', '/1y', '/allTime', '/start')
+    return markup
+
 @bot.message_handler(commands=['trends'])
+def command_news(message):
+    bot.send_message(message.chat.id, 'Select pediod', reply_markup=menuTrendsSelectPeriod())
+
+
+@bot.message_handler(commands=['7d'])
 def command_news(message):
     global asset
     bot.send_message(message.chat.id, 'Wait a minute...')
-    trendImageFilename = trends.getTrendImage(asset)
-    #bot.send_message(message.chat.id, news, reply_markup=getNewsMenu())
+
+    dd = dateconterter.getDates("-7d")
+    symbol = asset+"-USD"
+    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
+    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+    
     photo = open('../data/trends/'+trendImageFilename, 'rb')
     bot.send_photo(message.chat.id, photo)
 
 
+
+@bot.message_handler(commands=['1m'])
+def command_news(message):
+    global asset
+    bot.send_message(message.chat.id, 'Wait a minute...')
+
+    dd = dateconterter.getDates("-1m")
+    symbol = asset+"-USD"
+    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_1m.png"
+    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+    
+    photo = open('../data/trends/'+trendImageFilename, 'rb')
+    bot.send_photo(message.chat.id, photo)
+
+
+@bot.message_handler(commands=['1y'])
+def command_news(message):
+    global asset
+    bot.send_message(message.chat.id, 'Wait a minute...')
+
+    dd = dateconterter.getDates("-1y")
+    symbol = asset+"-USD"
+    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_1y.png"
+    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+    
+    photo = open('../data/trends/'+trendImageFilename, 'rb')
+    bot.send_photo(message.chat.id, photo)
+
+
+@bot.message_handler(commands=['allTime'])
+def command_news(message):
+    global asset
+    bot.send_message(message.chat.id, 'Wait a minute...')
+
+    dd = {
+        'dateStart': '2005-01-01',
+        'dateEnd': dateconterter.formatDate(datetime.now())
+    }
+    symbol = asset+"-USD"
+    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_alltime.png"
+    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+    
+    photo = open('../data/trends/'+trendImageFilename, 'rb')
+    bot.send_photo(message.chat.id, photo)
 
 #forcast ==========================================
 
