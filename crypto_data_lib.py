@@ -2,11 +2,11 @@
 import datetime
 
 import pandas as pd
+import pandas_datareader as pdr
 import numpy as np
 import matplotlib.pyplot as plt
-
 import matplotlib.dates as mdates
-import time
+
 NORM_CONST = pow(10, 10)
 def convert_to_float(name):
     a = name.replace(",",".")
@@ -28,7 +28,15 @@ def open_data(path):
     except:
         return []
 def draw_data(df, ax):
+    """
+
+    :param df:
+    :param ax:
+    :param type: 1 если открыт файл txt, 2 - если получили с yahoo
+    :return:
+    """
     ax.clear()
+
 
     #ndf = df.resample('W').median()
     ndf = df
@@ -41,12 +49,13 @@ def draw_data(df, ax):
     lb = ["{:.0f}".format(i) for i in np.linspace(df.price.min(), df.price.max(), 34)]
     ax.set_yticks(np.linspace(df.price.min(), df.price.max(), 34), lb, rotation="horizontal")
     #ax.figure.tight_layout()
+
     ax.figure.canvas.draw()
     ax.figure.canvas.show()
 
 
 
-class prognoz_period():
+class Period():
     def __init__(self, b=0, e=0):
 
         assert (isinstance(b, int) and b == 0) or (isinstance(b, datetime.datetime))
@@ -57,6 +66,7 @@ class prognoz_period():
             assert isinstance(b, datetime.datetime) and isinstance(e, datetime.datetime), "Задана конечная дата, но не задана начальная дата"
             assert e > b, "Некорректно задан период, конец раньше начала"
             self.end = e
+
 
     def change_begin_period(self, b, type="num"):
         if b is None:
@@ -89,6 +99,11 @@ class prognoz_period():
 
     def get_data_fromat_end(self):
         return self.conv_to_data(self.end)
+
+
+def get_yahoo(symbol="btn", period=Period(datetime.datetime.now()-datetime.timedelta(365), datetime.datetime.now())):
+        df = pdr.get_data_yahoo(symbol, period.begin, period.end)
+        return df
 
 if __name__ == '__main__':
     #     #df  = pd.read_csv("data/BTCUSDT_1d_1502928000000-1589241600000_86400000_1000.csv", index_col=['timestamp'], parse_dates=['price'])

@@ -1,12 +1,9 @@
-import os, glob, sys
+import os
+import numpy as np
 
-def quiet(*args):
-    pass
-
-trace = quiet
-
-testfiles = glob.glob("*.py")
-testfiles.sort()
-trace(os.getcwd(), *testfiles)
-print(*testfiles)
-print(sys.executable)
+from matplotlib import pyplot as plt
+import seaborn as sns
+#os.chdir('D:/Practical Time Series/')
+zero_mean_series = np.random.normal(loc=0.0, scale=1., size=100)
+plt.plot(zero_mean_series)
+plt.show()

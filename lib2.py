@@ -12,7 +12,7 @@ from pmdarima.arima import auto_arima, ADFTest
 
 
 import statsmodels
-import lib1
+import crypto_data_lib
 
 class TimeSeriesPrediction():
 
@@ -64,9 +64,9 @@ class TimeSeriesPrediction():
 
 
 if __name__ == "__main__":
-    df = lib1.open_data("data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv")
+    df = crypto_data_lib.open_data("data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv")
 
-    period = lib1.prognoz_period(datetime.datetime(2021, 5, 19), datetime.datetime(2021, 7, 24))
+    period = crypto_data_lib.Period(datetime.datetime(2021, 5, 19), datetime.datetime(2021, 7, 24))
     #datetime.datetime(2017, 12, 3, 14, 17, 41, 581112, tzinfo=datetime.timezone.utc)
 
     ts = TimeSeriesPrediction(df[period.begin:period.end])

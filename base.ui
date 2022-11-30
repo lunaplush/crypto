@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1154</width>
-    <height>871</height>
+    <width>1234</width>
+    <height>891</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="btnClose">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>770</y>
+      <x>960</x>
+      <y>810</y>
       <width>251</width>
       <height>25</height>
      </rect>
@@ -42,81 +42,45 @@
      <rect>
       <x>359</x>
       <y>10</y>
-      <width>761</width>
+      <width>851</width>
       <height>541</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="graph"/>
    </widget>
-   <widget class="QLineEdit" name="textBegin">
+   <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>590</y>
-      <width>113</width>
-      <height>25</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="textEndTime">
-    <property name="geometry">
-     <rect>
-      <x>530</x>
-      <y>590</y>
-      <width>113</width>
-      <height>25</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="btnRefresh">
-    <property name="geometry">
-     <rect>
-      <x>670</x>
-      <y>590</y>
-      <width>151</width>
-      <height>25</height>
+      <x>680</x>
+      <y>550</y>
+      <width>321</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Перерисовать</string>
+     <string>&lt;span style=&quot;font-size:9pt; font-style:italic;&quot;&gt;Выберите диапазон дат на графике с помощью мышки&lt;/span&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnFullPeriod">
+   <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>840</x>
-      <y>590</y>
-      <width>181</width>
-      <height>25</height>
+      <x>1010</x>
+      <y>550</y>
+      <width>321</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Показать весь период</string>
+     <string>&lt;span style=&quot;font-size:9pt; font-style:italic;&quot;&gt;либо из перечня ниже&lt;/span&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btnLinReg">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
+   <widget class="QFrame" name="frame_2">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>660</y>
-      <width>221</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Линейная регрессия</string>
-    </property>
-   </widget>
-   <widget class="QFrame" name="frame">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>560</y>
-      <width>311</width>
-      <height>261</height>
+      <x>640</x>
+      <y>570</y>
+      <width>578</width>
+      <height>237</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -125,42 +89,154 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1" rowspan="2">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Периоды для настройки модели</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListView" name="lstPeriod"/>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="btnRefresh">
+         <property name="text">
+          <string>Перерисовать</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnFullPeriod">
+         <property name="text">
+          <string>Показать весь период</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Рабочий период</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLineEdit" name="txtEndPeriod"/>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="txtBeginPeriod"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
-   <widget class="QPushButton" name="btnArima">
+   <widget class="QFrame" name="frame_3">
     <property name="geometry">
      <rect>
-      <x>580</x>
-      <y>660</y>
-      <width>191</width>
-      <height>25</height>
+      <x>30</x>
+      <y>570</y>
+      <width>581</width>
+      <height>271</height>
      </rect>
     </property>
-    <property name="text">
-     <string>ARIMA</string>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
     </property>
-   </widget>
-   <widget class="QListView" name="lstPeriod">
-    <property name="geometry">
-     <rect>
-      <x>800</x>
-      <y>630</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
     </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>640</x>
-      <y>560</y>
-      <width>205</width>
-      <height>15</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>&lt;span style=&quot;font-size:9pt; font-style:italic;&quot;&gt;Выберите диапазон дат на графике&lt;/span&gt;</string>
-    </property>
+    <widget class="QPushButton" name="btnLinReg">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>221</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Линейная регрессия</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="btnArima">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>200</y>
+       <width>191</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ARIMA</string>
+     </property>
+    </widget>
+    <widget class="QFrame" name="frame">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>221</width>
+       <height>171</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QTextEdit" name="txtPrognoz">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>10</y>
+       <width>331</width>
+       <height>171</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -168,7 +244,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1154</width>
+     <width>1234</width>
      <height>22</height>
     </rect>
    </property>
@@ -177,6 +253,7 @@
      <string>Меню</string>
     </property>
     <addaction name="actionOpenFile"/>
+    <addaction name="actionOpenYahoo"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -184,6 +261,11 @@
   <action name="actionOpenFile">
    <property name="text">
     <string>Открыть файл</string>
+   </property>
+  </action>
+  <action name="actionOpenYahoo">
+   <property name="text">
+    <string>Загрузить с  yahoo</string>
    </property>
   </action>
  </widget>

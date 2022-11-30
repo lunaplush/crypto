@@ -12,7 +12,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 import matplotlib.dates as mdates
 
-import lib1
+import crypto_data_lib
 import lib2
 
 
@@ -44,39 +44,39 @@ class PdTable(QAbstractTableModel):
             return self._data.axes[0][col]
         return None
 
-
-
-
-
 class mainApp(QMainWindow):
 
     def __init__(self):
         super(mainApp, self).__init__()
         uic.loadUi("base.ui", self)
+        self.adjust_window()
+        self.adjust_functional()
         self.createMenus()
-        self.btnClose.clicked.connect(QCoreApplication.instance().quit)
+        self.period = crypto_data_lib.Period()
+        self.set_period_list()
+
+    def adjust_window(self):
+        self.setWindowTitle("Аналитик")
         self.figure = plt.figure(figsize=(30, 20), facecolor="#FFFFFF")
-        #self.figure.tight_layout()
+        # self.figure.tight_layout()
         self.canvas = FigureCanvas(self.figure)
-        #self.figure.tight_layout()
+        # self.figure.tight_layout()
         self.graph.addWidget(self.canvas)
         self.ax = self.figure.subplots(1, 1)
         self.canvas.figure.set_constrained_layout("constrained")
-       # self.viewData("data/BTCUSDT_1d_1502928000000-1589241600000_86400000_1000.csv")
-        self.actionOpenFile.triggered.connect(self.onOpenFile)
         cid = self.canvas.mpl_connect('button_press_event', self.onclick_canvas)
         cid2 = self.canvas.mpl_connect('button_release_event', self.onnonclick_canvas)
-      # self.df = None
-        self.period = lib1.prognoz_period()
+
+    # self.viewData("data/BTCUSDT_1d_1502928000000-1589241600000_86400000_1000.csv")
+
+    def adjust_functional(self):
+        self.actionOpenFile.triggered.connect(self.onOpenFile)
+        self.actionOpenYahoo.triggered.connect(self.onOpenYahoo)
+        self.btnClose.clicked.connect(QCoreApplication.instance().quit)
         self.btnRefresh.clicked.connect(self.changePeriod)
         self.btnFullPeriod.clicked.connect(self.returnFullPeriod)
         self.btnLinReg.clicked.connect(self.doLinearRegression)
         self.btnArima.clicked.connect(self.doArima)
-
-
-        self.set_period_list()
-
-
 
     def set_period_list(self):
         slm = QtCore.QStringListModel()
@@ -93,9 +93,11 @@ class mainApp(QMainWindow):
         self.period.change_begin_period(b, type="str")
         self.period.change_end_period(e, type="str")
 
-        self.textBegin.setText(self.period.get_data_format_begin())
-        self.textEndTime.setText(self.period.get_data_fromat_end())
+        self.txtBeginPeriod.setText(self.period.get_data_format_begin())
+        self.txtEndPeriod.setText(self.period.get_data_fromat_end())
         self.btnLinReg.setDisabled(False)
+        self.btnArima.setDisabled(False)
+        self.btnRefresh.click()
 
     def onclick_canvas(self, event):
         self.clickPos = event.xdata
@@ -129,9 +131,11 @@ class mainApp(QMainWindow):
             bPos, ePos = ePos, bPos
         self.period.change_begin_period(bPos)
         self.period.change_end_period(ePos)
-        self.textEndTime.setText(self.period.get_data_fromat_end())
-        self.textBegin.setText(self.period.get_data_format_begin())
+        self.txtEndPeriod.setText(self.period.get_data_fromat_end())
+        self.txtBeginPeriod.setText(self.period.get_data_format_begin())
         self.btnLinReg.setDisabled(False)
+        self.btnArima.setDisabled(False)
+        self.btnRefresh.click()
 
     def createMenus(self):
         menubar = self.menuBar()
@@ -139,38 +143,49 @@ class mainApp(QMainWindow):
     def onOpenFile(self):
         file = QFileDialog.getOpenFileName()
         if file:
-           self.viewData(file[0])
+           self.df = crypto_data_lib.open_data(file)
+           self.df["date"] = self.df.index
+           self.viewData()
 
-    def viewData(self, file = "data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv" ):
+    def onOpenYahoo(self):
+        self.df = crypto_data_lib.get_yahoo()
+        self.df["price"] = self.df.Low
+        self.viewData()
+        self.btnLinReg.setDisabled(False)
+        self.btnArima.setDisabled(False)
+
+    def viewData(self ):
 
         #cid = self.canvas.mpl_connect('button_press_event', onclick_canvas)
-        self.df = lib1.open_data(file)
-        self.df["date"] = self.df.index
-        if len(self.df):
+
+        if hasattr(self, "df"):
             model = PdTable(self.df)
             view = self.tableView
             view.setModel(model)
             view.setWindowTitle('Pandas')
             view.setAlternatingRowColors(True)
             view.show()
-            lib1.draw_data(self.df, self.ax)
-            self.textBegin
+
+            crypto_data_lib.draw_data(self.df, self.ax)
+
+            self.txtBeginPeriod
             #self.graphicsView.setModel(model)
         self.period.change_begin_period(mdates.date2num(self.df.index[0]))
         self.period.change_end_period(mdates.date2num(self.df.index[-1]))
-        self.textBegin.setText(self.period.get_data_format_begin())
-        self.textEndTime.setText(self.period.get_data_fromat_end())
+        self.txtBeginPeriod.setText(self.period.get_data_format_begin())
+        self.txtEndPeriod.setText(self.period.get_data_fromat_end())
 
     def changePeriod(self):
-
-        lib1.draw_data(self.df[self.period.begin:self.period.end], self.ax)
+        if hasattr(self, "df"):
+            crypto_data_lib.draw_data(self.df[self.period.begin:self.period.end], self.ax)
 
     def returnFullPeriod(self):
-        lib1.draw_data(self.df, self.ax)
-        self.period.change_begin_period(mdates.date2num(self.df.index[0]))
-        self.period.change_end_period(mdates.date2num(self.df.index[-1]))
-        self.textBegin.setText(self.period.get_data_format_begin())
-        self.textEndTime.setText(self.period.get_data_fromat_end())
+        if hasattr(self, "df"):
+            crypto_data_lib.draw_data(self.df, self.ax)
+            self.period.change_begin_period(mdates.date2num(self.df.index[0]))
+            self.period.change_end_period(mdates.date2num(self.df.index[-1]))
+            self.txtBeginPeriod.setText(self.period.get_data_format_begin())
+            self.txtEndPeriod.setText(self.period.get_data_fromat_end())
 
     def doLinearRegression(self):
         resVisual = QVBoxLayout()
@@ -202,8 +217,7 @@ class mainApp(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-
     window = mainApp()
-    window.viewData()
+    #window.viewData()
     window.show()
     app.exec_()
