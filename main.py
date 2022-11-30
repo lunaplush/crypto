@@ -148,11 +148,14 @@ class mainApp(QMainWindow):
            self.viewData()
 
     def onOpenYahoo(self):
-        self.df = crypto_data_lib.get_yahoo()
-        self.df["price"] = self.df.Low
-        self.viewData()
-        self.btnLinReg.setDisabled(False)
-        self.btnArima.setDisabled(False)
+        try:
+            self.df = crypto_data_lib.get_yahoo()
+            self.df["price"] = self.df.Low
+            self.viewData()
+            self.btnLinReg.setDisabled(False)
+            self.btnArima.setDisabled(False)
+        except OSError:
+            pass
 
     def viewData(self ):
 
