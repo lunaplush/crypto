@@ -101,7 +101,7 @@ class Period():
         return self.conv_to_data(self.end)
 
 
-def get_yahoo(symbol="btn", period=Period(datetime.datetime.now()-datetime.timedelta(365), datetime.datetime.now())):
+def get_yahoo(symbol="btc-usd", period=Period(datetime.datetime.now()-datetime.timedelta(365), datetime.datetime.now())):
         df = pdr.get_data_yahoo(symbol, period.begin, period.end)
         return df
 
