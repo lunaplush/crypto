@@ -153,10 +153,10 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLineEdit" name="txtEndPeriod"/>
+          <widget class="QLineEdit" name="txtBeginPeriod"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="txtBeginPeriod"/>
+          <widget class="QLineEdit" name="txtEndPeriod"/>
          </item>
         </layout>
        </item>

@@ -143,8 +143,8 @@ class mainApp(QMainWindow):
     def onOpenFile(self):
         file = QFileDialog.getOpenFileName()
         if file:
-           self.df = crypto_data_lib.open_data(file)
-           self.df["date"] = self.df.index
+           self.df = crypto_data_lib.open_data(file[0])
+         #  self.df["date"] = self.df.index
            self.viewData()
 
     def onOpenYahoo(self):
