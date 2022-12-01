@@ -13,7 +13,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.dates as mdates
 
 import crypto_data_lib
-import lib2
+import time_series_prediction_lib
 
 
 class PdTable(QAbstractTableModel):
@@ -150,7 +150,7 @@ class mainApp(QMainWindow):
     def onOpenYahoo(self):
         try:
             self.df = crypto_data_lib.get_yahoo()
-            self.df["price"] = self.df.Low
+            self.df["price"] = (self.df.Low + self.df.High)/2
             self.viewData()
             self.btnLinReg.setDisabled(False)
             self.btnArima.setDisabled(False)
@@ -191,19 +191,8 @@ class mainApp(QMainWindow):
             self.txtEndPeriod.setText(self.period.get_data_fromat_end())
 
     def doLinearRegression(self):
-        resVisual = QVBoxLayout()
-        self.frame.setLayout(resVisual)
-        self.figure2 = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
-        self.canvas2 = FigureCanvas(self.figure2)
-        resVisual.addWidget(self.canvas2)
-        self.ax2 = self.figure2.subplots(1,1)
-        ts = lib2.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
-        ts.plot_linear_regression(ts, self.ax)
-        ts.plot_linear_regression(ts, self.ax2)
-        self.ax.figure.canvas.draw()
-        self.ax2.figure.canvas.draw()
-
-        self.frame.show()
+        self.ts_model = time_series_prediction_lib.TSPLinearRegression(self.df[self.period.begin:self.period.end])
+        self.view_prediction_result()
 
     def doArima(self):
         resVisual = QVBoxLayout()
@@ -212,15 +201,40 @@ class mainApp(QMainWindow):
         self.canvas2 = FigureCanvas(self.figure2)
         resVisual.addWidget(self.canvas2)
         self.ax2 = self.figure2.subplots(1, 1)
-        ts = lib2.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
+        ts = time_series_prediction_lib.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
         #ts.plot_arima(ts, self.ax)
         ts.plot_arima(ts, self.ax2)
         self.ax.figure.canvas.draw()
         self.ax2.figure.canvas.draw()
 
+    def view_prediction_result(self):
+        if hasattr(self, "ts_model"):
+            resVisual = QVBoxLayout()
+            self.frame.setLayout(resVisual)
+            self.figure2 = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
+            self.canvas2 = FigureCanvas(self.figure2)
+            resVisual.addWidget(self.canvas2)
+            self.ax2 = self.figure2.subplots(1, 1)
+            self.ts_model.plot_model(self.ax)
+            self.ts_model.plot_model(self.ax2)
+            self.ax.figure.canvas.draw()
+            self.ax2.figure.canvas.draw()
+            self.frame.show()
+            report = "<p>"+str(self.ts_model.score())+"<p>"
+            self.txtPrognoz.setDocumentTitle("Прогноз:")
+            self.txtPrognoz.setText(report)
+
+    def tmp_start_function_for_development(self):
+        self.df = crypto_data_lib.open_data("data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv")
+        self.viewData()
+
+
+
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = mainApp()
-    #window.viewData()
+    window.tmp_start_function_for_development()
     window.show()
     app.exec_()

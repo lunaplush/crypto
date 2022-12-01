@@ -181,7 +181,7 @@
     </property>
     <widget class="QPushButton" name="btnLinReg">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
@@ -197,7 +197,7 @@
     </widget>
     <widget class="QPushButton" name="btnArima">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
      <property name="geometry">
       <rect>
