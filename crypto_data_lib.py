@@ -36,8 +36,6 @@ def draw_data(df, ax):
     :return:
     """
     ax.clear()
-
-
     #ndf = df.resample('W').median()
     ndf = df
     #ndf.price.plot(x="timestamp", style=".-")
@@ -71,20 +69,34 @@ class Period():
     def change_begin_period(self, b, type="num"):
         if b is None:
             self.begin = None
+            return True
         elif type == "num":
             self.begin = mdates.num2date(b)
+            return True
         elif type == "str":
-            y, m, d = map(int, b.split("/"))
-            self.begin = datetime.datetime(year=y, month=m, day=d)
+            try:
+                y, m, d = map(int, b.split("/"))
+                self.begin = datetime.datetime(year=y, month=m, day=d, hour=3)
+                return True
+            except:
+                self.begin = None
+                return False
 
-    def change_end_period(self, e, type="num"):
+    def change_end_period(self, e, type = "num"):
         if e is None:
             self.end = None
+            return True
         elif type == "num":
             self.end = mdates.num2date(e)
+            return True
         elif type == "str":
-            y, m, d = map(int, e.split("/"))
-            self.end = datetime.datetime(year=y, month=m, day=d)
+            try:
+                y, m, d = map(int, e.split("/"))
+                self.end = datetime.datetime(year=y, month=m, day=d, hour=3)
+                return True
+            except:
+                self.end = None
+                return False
 
 
     def change_period(self, b, e):

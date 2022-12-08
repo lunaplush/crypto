@@ -6,6 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt5 import uic, QtCore
 import sys
+import datetime
 import os
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -73,7 +74,7 @@ class mainApp(QMainWindow):
         self.actionOpenFile.triggered.connect(self.onOpenFile)
         self.actionOpenYahoo.triggered.connect(self.onOpenYahoo)
         self.btnClose.clicked.connect(QCoreApplication.instance().quit)
-        self.btnRefresh.clicked.connect(self.changePeriod)
+        self.btnRefresh.clicked.connect(self.getPeridFromInp)
         self.btnFullPeriod.clicked.connect(self.returnFullPeriod)
         self.btnLinReg.clicked.connect(self.doLinearRegression)
         self.btnArima.clicked.connect(self.doArima)
@@ -97,8 +98,8 @@ class mainApp(QMainWindow):
         self.txtEndPeriod.setText(self.period.get_data_fromat_end())
         self.btnLinReg.setDisabled(False)
         self.btnArima.setDisabled(False)
-        self.btnRefresh.click()
-
+      #  self.btnRefresh.click()
+        self.refreshGraphs()
     def onclick_canvas(self, event):
         self.clickPos = event.xdata
         if event.xdata is None:
@@ -135,8 +136,8 @@ class mainApp(QMainWindow):
         self.txtBeginPeriod.setText(self.period.get_data_format_begin())
         self.btnLinReg.setDisabled(False)
         self.btnArima.setDisabled(False)
-        self.btnRefresh.click()
-
+       # self.btnRefresh.click()
+        self.refreshGraphs()
     def createMenus(self):
         menubar = self.menuBar()
 
@@ -157,7 +158,7 @@ class mainApp(QMainWindow):
         except OSError:
             pass
 
-    def viewData(self ):
+    def viewData(self):
 
         #cid = self.canvas.mpl_connect('button_press_event', onclick_canvas)
 
@@ -171,15 +172,22 @@ class mainApp(QMainWindow):
 
             crypto_data_lib.draw_data(self.df, self.ax)
 
-            self.txtBeginPeriod
+
             #self.graphicsView.setModel(model)
         self.period.change_begin_period(mdates.date2num(self.df.index[0]))
         self.period.change_end_period(mdates.date2num(self.df.index[-1]))
         self.txtBeginPeriod.setText(self.period.get_data_format_begin())
         self.txtEndPeriod.setText(self.period.get_data_fromat_end())
 
-    def changePeriod(self):
+    def getPeridFromInp(self):
+
+        self.period.change_begin_period(self.txtBeginPeriod.text(), type="str")
+        self.period.change_end_period(self.txtEndPeriod.text(), type="str")
+        self.refreshGraphs()
+
+    def refreshGraphs(self):
         if hasattr(self, "df"):
+
             crypto_data_lib.draw_data(self.df[self.period.begin:self.period.end], self.ax)
 
     def returnFullPeriod(self):
@@ -192,6 +200,8 @@ class mainApp(QMainWindow):
 
     def doLinearRegression(self):
         self.ts_model = time_series_prediction_lib.TSPLinearRegression(self.df[self.period.begin:self.period.end])
+    #    self.df_prognoz = pd.concat((self.df.price, pd.DataFrame( [20000], columns=["price"], index=max(self.df.index)+datetime.timedelta(1))))
+    #    crypto_data_lib.draw_data(self.df_prognoz, self.ax)
         self.view_prediction_result()
 
     def doArima(self):
