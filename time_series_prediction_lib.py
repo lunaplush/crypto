@@ -62,7 +62,7 @@ class TSPLinearRegression(TimeSeriesPrediction):
         self.model.fit(self.get_index_as_array(), self.get_column_as_array(col="price"))
 
     def predict(self):
-        self.fit()
+        #self.fit()
         return np.array([self.model.intercept_, self.model.coef_[0]])
 
     def plot_model(self, ax):

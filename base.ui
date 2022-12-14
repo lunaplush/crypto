@@ -179,38 +179,6 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QPushButton" name="btnLinReg">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>200</y>
-       <width>221</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Линейная регрессия</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="btnArima">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>250</x>
-       <y>200</y>
-       <width>191</width>
-       <height>25</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>ARIMA</string>
-     </property>
-    </widget>
     <widget class="QFrame" name="frame">
      <property name="geometry">
       <rect>
@@ -236,6 +204,60 @@
        <height>171</height>
       </rect>
      </property>
+    </widget>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>504</width>
+       <height>27</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>20</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btnLinReg">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Линейная регрессия</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnArima">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>154</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>ARIMA</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnPredict1">
+        <property name="minimumSize">
+         <size>
+          <width>154</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Прогноз</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </widget>
   </widget>

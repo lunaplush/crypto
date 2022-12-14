@@ -78,6 +78,7 @@ class mainApp(QMainWindow):
         self.btnFullPeriod.clicked.connect(self.returnFullPeriod)
         self.btnLinReg.clicked.connect(self.doLinearRegression)
         self.btnArima.clicked.connect(self.doArima)
+        self.btnPredict1.clicked.connect(self.doPrediction)
 
     def set_period_list(self):
         slm = QtCore.QStringListModel()
@@ -216,6 +217,9 @@ class mainApp(QMainWindow):
         ts.plot_arima(ts, self.ax2)
         self.ax.figure.canvas.draw()
         self.ax2.figure.canvas.draw()
+
+    def doPrediction(self):
+        pass
 
     def view_prediction_result(self):
         if hasattr(self, "ts_model"):

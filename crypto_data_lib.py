@@ -46,6 +46,12 @@ def draw_data(df, ax):
     ax.set_xticks(ndf.index[0:n:step_by_date], lb, rotation="vertical")
     lb = ["{:.0f}".format(i) for i in np.linspace(df.price.min(), df.price.max(), 34)]
     ax.set_yticks(np.linspace(df.price.min(), df.price.max(), 34), lb, rotation="horizontal")
+    if ndf.index[0].month < 6:
+        year_add = 0
+    else:
+        year_add = 1
+    for i in range(ndf.index[0].year+year_add, ndf.index[-1].year+1):
+        ax.axvline(mdates.date2num(datetime.date(i,1,1)), linestyle=":")
     #ax.figure.tight_layout()
 
     ax.figure.canvas.draw()
