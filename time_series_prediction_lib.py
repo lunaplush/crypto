@@ -1,6 +1,7 @@
 #Библиотека для прогнозирования
 import datetime
 import os
+import itertools
 
 import pandas as pd
 import numpy as np
@@ -13,6 +14,8 @@ import statsmodels
 from prophet.serialize import model_to_json, model_from_json
 from prophet import Prophet
 from prophet.plot import plot as plot_prophet
+from prophet.diagnostics import cross_validation, performance_metrics
+
 
 import crypto_data_lib
 import crypto_data_lib
@@ -20,8 +23,12 @@ import crypto_data_lib
 class Forecast:
     def __init__(self, symbol, date):
         self.name = date.strftime("%Y%m%d") + "-" + str(symbol)
-        self.path_model = os.path.join("data", "forecasts", self.name + ".json")
-        self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
+        if os.path.split(os.getcwd())[1] == "teleblt":
+            self.path_model = os.path.join("..", "data", "forecasts", self.name + ".json")
+            self.path_figure = os.path.join("..", "data", "forecasts", self.name + ".png")
+        else:
+            self.path_model = os.path.join("data", "forecasts", self.name + ".json")
+            self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
 
     def add_forecas_data(self, df):
         self.df = df
@@ -108,13 +115,37 @@ class TSPLinearRegression(TimeSeriesPrediction):
         y = self.get_column_as_array(col="price")
         return self.model.score(x, y)
 
-def make_prophet_model(predict_period = 14):
+def search_optimal_parameters(df):
+    params = {"changepoint_prior_scale": [0.01, 0.03, 0.05, 0.1, 1],
+              "seasonality_prior_scale": [2, 7, 10, 13, 15]
+              }
+
+    all_params = [dict(zip(params.keys(), t)) for t in itertools.product(*params.values())]
+
+    rmse_error = []
+    for pr in all_params:
+        model = Prophet(**pr).fit(df)
+        df_cv = cross_validation(model, initial="240 days", horizon="14 days", period="7 days", )
+        metrics = performance_metrics(df_cv)
+        rmse_error.append(metrics["rmse"].values[0])
+
+    tuning_results = pd.DataFrame(all_params)
+    tuning_results["rmse"] = rmse_error
+
+    best_params = all_params[np.argmin(rmse_error)]
+    print(best_params)
+    return best_params
+
+
+def make_prophet_model(symbol):
     try:
-        df_raw = crypto_data_lib.get_yahoo()
+        df_raw = crypto_data_lib.get_yahoo(symbol)
         df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
         df_raw.reset_index(inplace=True)
         df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
-        model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
+        good_params = search_optimal_parameters(df)
+        model = Prophet(**good_params).fit(df)
+        # model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
         return model
 
     except:
@@ -125,7 +156,7 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
         forecast = Forecast(symbol=symbol, date=date)
 
         if not(os.path.isfile(forecast.path_model)):
-            model = make_prophet_model(period)
+            model = make_prophet_model(symbol)
             if model is None:
                 return None
             else:
@@ -181,5 +212,8 @@ if __name__ == "__main__":
     # print("sklearn Linear reg ", W, "\n")
 
 
-    forecast = get_forecast(date=datetime.datetime.now())
+  #  forecast = get_forecast(symbol="xpr-usd", date=datetime.datetime.now())
+    #forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
+    forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
+
     print(forecast.get_forecast_data())
