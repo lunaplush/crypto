@@ -8,7 +8,7 @@ from PyQt5 import uic, QtCore
 import sys
 import os
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+#from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 import matplotlib.dates as mdates
 

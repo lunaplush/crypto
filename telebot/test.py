@@ -1,21 +1,10 @@
-#from datetime import datetime, timedelta
-import dateconterter
-
-dif = "-7d"
-dif = "+1m"
-dif = "-10m"
-dif = "-1y"
-test = dateconterter.getDates(dif)
-print(test)
+import pandas_datareader as pdr
+import mplfinance as mpf
+import pandas as pd
+import datetime as dt
 
 
-"""
-d = datetime.now()
-print(d)
+df = pdr.get_data_yahoo('BTC-USD', '2021-01-01' , '2022-01-01')
+print(df.head())
 
-td = timedelta(days=10)
-print(td)
-
-nd = d-td
-print(nd.strftime("%Y-%m-%d"))
-"""
+mpf.plot(df, type='candle', volume=True)
