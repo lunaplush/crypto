@@ -6,6 +6,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 from PyQt5 import uic, QtCore
 import sys
+import datetime
 import os
 import matplotlib.pyplot as plt
 #from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -13,7 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 import crypto_data_lib
-import lib2
+import time_series_prediction_lib
 
 
 class PdTable(QAbstractTableModel):
@@ -73,10 +74,11 @@ class mainApp(QMainWindow):
         self.actionOpenFile.triggered.connect(self.onOpenFile)
         self.actionOpenYahoo.triggered.connect(self.onOpenYahoo)
         self.btnClose.clicked.connect(QCoreApplication.instance().quit)
-        self.btnRefresh.clicked.connect(self.changePeriod)
+        self.btnRefresh.clicked.connect(self.getPeridFromInp)
         self.btnFullPeriod.clicked.connect(self.returnFullPeriod)
         self.btnLinReg.clicked.connect(self.doLinearRegression)
         self.btnArima.clicked.connect(self.doArima)
+        self.btnPredict1.clicked.connect(self.doPrediction)
 
     def set_period_list(self):
         slm = QtCore.QStringListModel()
@@ -97,8 +99,8 @@ class mainApp(QMainWindow):
         self.txtEndPeriod.setText(self.period.get_data_fromat_end())
         self.btnLinReg.setDisabled(False)
         self.btnArima.setDisabled(False)
-        self.btnRefresh.click()
-
+      #  self.btnRefresh.click()
+        self.refreshGraphs()
     def onclick_canvas(self, event):
         self.clickPos = event.xdata
         if event.xdata is None:
@@ -135,8 +137,8 @@ class mainApp(QMainWindow):
         self.txtBeginPeriod.setText(self.period.get_data_format_begin())
         self.btnLinReg.setDisabled(False)
         self.btnArima.setDisabled(False)
-        self.btnRefresh.click()
-
+       # self.btnRefresh.click()
+        self.refreshGraphs()
     def createMenus(self):
         menubar = self.menuBar()
 
@@ -148,13 +150,16 @@ class mainApp(QMainWindow):
            self.viewData()
 
     def onOpenYahoo(self):
-        self.df = crypto_data_lib.get_yahoo()
-        self.df["price"] = self.df.Low
-        self.viewData()
-        self.btnLinReg.setDisabled(False)
-        self.btnArima.setDisabled(False)
+        try:
+            self.df = crypto_data_lib.get_yahoo()
+            self.df["price"] = (self.df.Low + self.df.High)/2
+            self.viewData()
+            self.btnLinReg.setDisabled(False)
+            self.btnArima.setDisabled(False)
+        except OSError:
+            pass
 
-    def viewData(self ):
+    def viewData(self):
 
         #cid = self.canvas.mpl_connect('button_press_event', onclick_canvas)
 
@@ -168,15 +173,22 @@ class mainApp(QMainWindow):
 
             crypto_data_lib.draw_data(self.df, self.ax)
 
-            self.txtBeginPeriod
+
             #self.graphicsView.setModel(model)
         self.period.change_begin_period(mdates.date2num(self.df.index[0]))
         self.period.change_end_period(mdates.date2num(self.df.index[-1]))
         self.txtBeginPeriod.setText(self.period.get_data_format_begin())
         self.txtEndPeriod.setText(self.period.get_data_fromat_end())
 
-    def changePeriod(self):
+    def getPeridFromInp(self):
+
+        self.period.change_begin_period(self.txtBeginPeriod.text(), type="str")
+        self.period.change_end_period(self.txtEndPeriod.text(), type="str")
+        self.refreshGraphs()
+
+    def refreshGraphs(self):
         if hasattr(self, "df"):
+
             crypto_data_lib.draw_data(self.df[self.period.begin:self.period.end], self.ax)
 
     def returnFullPeriod(self):
@@ -188,19 +200,10 @@ class mainApp(QMainWindow):
             self.txtEndPeriod.setText(self.period.get_data_fromat_end())
 
     def doLinearRegression(self):
-        resVisual = QVBoxLayout()
-        self.frame.setLayout(resVisual)
-        self.figure2 = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
-        self.canvas2 = FigureCanvas(self.figure2)
-        resVisual.addWidget(self.canvas2)
-        self.ax2 = self.figure2.subplots(1,1)
-        ts = lib2.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
-        ts.plot_linear_regression(ts, self.ax)
-        ts.plot_linear_regression(ts, self.ax2)
-        self.ax.figure.canvas.draw()
-        self.ax2.figure.canvas.draw()
-
-        self.frame.show()
+        self.ts_model = time_series_prediction_lib.TSPLinearRegression(self.df[self.period.begin:self.period.end])
+    #    self.df_prognoz = pd.concat((self.df.price, pd.DataFrame( [20000], columns=["price"], index=max(self.df.index)+datetime.timedelta(1))))
+    #    crypto_data_lib.draw_data(self.df_prognoz, self.ax)
+        self.view_prediction_result()
 
     def doArima(self):
         resVisual = QVBoxLayout()
@@ -209,15 +212,43 @@ class mainApp(QMainWindow):
         self.canvas2 = FigureCanvas(self.figure2)
         resVisual.addWidget(self.canvas2)
         self.ax2 = self.figure2.subplots(1, 1)
-        ts = lib2.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
+        ts = time_series_prediction_lib.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
         #ts.plot_arima(ts, self.ax)
         ts.plot_arima(ts, self.ax2)
         self.ax.figure.canvas.draw()
         self.ax2.figure.canvas.draw()
 
+    def doPrediction(self):
+        pass
+
+    def view_prediction_result(self):
+        if hasattr(self, "ts_model"):
+            resVisual = QVBoxLayout()
+            self.frame.setLayout(resVisual)
+            self.figure2 = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
+            self.canvas2 = FigureCanvas(self.figure2)
+            resVisual.addWidget(self.canvas2)
+            self.ax2 = self.figure2.subplots(1, 1)
+            self.ts_model.plot_model(self.ax)
+            self.ts_model.plot_model(self.ax2)
+            self.ax.figure.canvas.draw()
+            self.ax2.figure.canvas.draw()
+            self.frame.show()
+            report = "<p>"+str(self.ts_model.score())+"<p>"
+            self.txtPrognoz.setDocumentTitle("Прогноз:")
+            self.txtPrognoz.setText(report)
+
+    def tmp_start_function_for_development(self):
+        self.df = crypto_data_lib.open_data("data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv")
+        self.viewData()
+
+
+
+
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = mainApp()
-    #window.viewData()
+    window.tmp_start_function_for_development()
     window.show()
     app.exec_()

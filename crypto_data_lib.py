@@ -36,8 +36,6 @@ def draw_data(df, ax):
     :return:
     """
     ax.clear()
-
-
     #ndf = df.resample('W').median()
     ndf = df
     #ndf.price.plot(x="timestamp", style=".-")
@@ -48,6 +46,12 @@ def draw_data(df, ax):
     ax.set_xticks(ndf.index[0:n:step_by_date], lb, rotation="vertical")
     lb = ["{:.0f}".format(i) for i in np.linspace(df.price.min(), df.price.max(), 34)]
     ax.set_yticks(np.linspace(df.price.min(), df.price.max(), 34), lb, rotation="horizontal")
+    if ndf.index[0].month < 6:
+        year_add = 0
+    else:
+        year_add = 1
+    for i in range(ndf.index[0].year+year_add, ndf.index[-1].year+1):
+        ax.axvline(mdates.date2num(datetime.date(i,1,1)), linestyle=":")
     #ax.figure.tight_layout()
 
     ax.figure.canvas.draw()
@@ -71,20 +75,34 @@ class Period():
     def change_begin_period(self, b, type="num"):
         if b is None:
             self.begin = None
+            return True
         elif type == "num":
             self.begin = mdates.num2date(b)
+            return True
         elif type == "str":
-            y, m, d = map(int, b.split("/"))
-            self.begin = datetime.datetime(year=y, month=m, day=d)
+            try:
+                y, m, d = map(int, b.split("/"))
+                self.begin = datetime.datetime(year=y, month=m, day=d, hour=3)
+                return True
+            except:
+                self.begin = None
+                return False
 
-    def change_end_period(self, e, type="num"):
+    def change_end_period(self, e, type = "num"):
         if e is None:
             self.end = None
+            return True
         elif type == "num":
             self.end = mdates.num2date(e)
+            return True
         elif type == "str":
-            y, m, d = map(int, e.split("/"))
-            self.end = datetime.datetime(year=y, month=m, day=d)
+            try:
+                y, m, d = map(int, e.split("/"))
+                self.end = datetime.datetime(year=y, month=m, day=d, hour=3)
+                return True
+            except:
+                self.end = None
+                return False
 
 
     def change_period(self, b, e):
