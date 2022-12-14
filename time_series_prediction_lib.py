@@ -17,6 +17,27 @@ from prophet.plot import plot as plot_prophet
 import crypto_data_lib
 import crypto_data_lib
 
+class Forecast:
+    def __init__(self, symbol, date):
+        self.name = date.strftime("%Y%m%d") + "-" + str(symbol)
+        self.path_model = os.path.join("data", "forecasts", self.name + ".json")
+        self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
+
+    def add_forecas_data(self, df):
+        self.df = df
+
+    def get_forecast_data(self):
+        if hasattr(self, "df"):
+            return self.df
+        else:
+            pd.DataFrame()
+
+
+
+
+
+
+
 class TimeSeriesPrediction():
 
     def __init__(self, df):
@@ -94,33 +115,40 @@ def make_prophet_model(predict_period = 14):
         df_raw.reset_index(inplace=True)
         df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
         model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
-        future = model.make_future_dataframe(periods=predict_period)
-        predict = model.predict(future)
-        date_now = datetime.datetime.now()
-        name = date_now.strftime("%Y%m%d") + ".json"
-        with open(os.path.join("data", "forecasts", name), "w") as f:
-            f.write(model_to_json(model))
-        return True
-    except:
-        return False
+        return model
 
-def get_forecast(date=datetime.datetime.now(), period=14):
-    try:
-        name = date.strftime("%Y%m%d")
-        name_json = name + ".json"
-        path = os.path.join("data", "forecasts", name_json)
-        if not(os.path.isfile(path)):
-            if not (make_prophet_model(period)):
-                return None
-        with open(path, "r") as f:
-            model = model_from_json(f.read())
-        future = model.make_future_dataframe(periods=period)
-        forecast = model.predict(future)
-        model.plot(forecast)
-        name_png = name + ".png"
-        plt.savefig(os.path.join("data", "forecasts", name_png), format = "png")
-        return forecast[-period:][["yhat_lower", "yhat", "yhat_upper"]]
     except:
+        return None
+
+def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
+    try:
+        forecast = Forecast(symbol=symbol, date=date)
+
+        if not(os.path.isfile(forecast.path_model)):
+            model = make_prophet_model(period)
+            if model is None:
+                return None
+            else:
+               with open(forecast.path_model, "w") as f:
+                    f.write(model_to_json(model))
+        else:
+            with open(forecast.path_model, "r") as f:
+                model = model_from_json(f.read())
+
+        future = model.make_future_dataframe(periods=period)
+        forecast_do = model.predict(future)
+
+        model.plot(forecast_do)
+        result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
+        result.set_index("ds", inplace=True)
+
+        for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
+            result[cl] = np.power(np.e, result[cl])
+
+        plt.savefig(forecast.path_figure, format="png")
+        forecast.add_forecas_data(result)
+        return forecast
+    except Exception:
         return None
 
 if __name__ == "__main__":
@@ -153,5 +181,5 @@ if __name__ == "__main__":
     # print("sklearn Linear reg ", W, "\n")
 
 
-    forecast = get_forecast(datetime.datetime.now())
-    print(forecast)
+    forecast = get_forecast(date=datetime.datetime.now())
+    print(forecast.get_forecast_data())
