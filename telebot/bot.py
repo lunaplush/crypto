@@ -5,9 +5,16 @@ from telebot import types
 from sqlighter import SQLighter
 from datetime import datetime, timedelta
 
+import sys
+sys.path.append("..")
+
 import config
 import dateconterter
 import trends
+
+#from time_series_prediction_lib import Forecast
+from time_series_prediction_lib import get_forecast, Forecast
+
 
 
 NEWS_LIMIT = 10
@@ -203,6 +210,15 @@ def command_forcast(message):
     bot.send_message(message.chat.id, 'Select forcast type', reply_markup=getForcastMenu())
 
 
+@bot.message_handler(commands=['wo_news'])
+def command_news(message):
+    global asset
+    symbol = asset+"-USD"
+    bot.send_message(message.chat.id, 'Wait a minute...')
+    forecast = get_forecast(symbol, date=datetime.now())
+    #print(forecast.path_figure)
+    photo = open(forecast.path_figure, 'rb')
+    bot.send_photo(message.chat.id, photo)
 
 
 
