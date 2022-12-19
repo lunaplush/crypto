@@ -1,7 +1,8 @@
 import mplfinance as mpf
 import pandas as pd
 import datetime as dt
-import pandas_datareader as pdr
+#import pandas_datareader as pdr
+import yfinance as yf
 
 
 #now = dt.datetime.now()
@@ -15,8 +16,9 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
     #filename = f"{symbol.lower()}_{dateStart}_{dateEnd}.png"
 
     #df = pdr.get_data_yahoo(stock, start , now)
-    df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
-    print(df.head())
+    #df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
+    df = yf.download(symbol, dateStart, dateEnd)
+    #print(df.head())
     #mpf.plot(df,type='candle',style='yahoo',savefig=filename)
     #mpf.plot(df, type='candle', style='yahoo', volume=True)
     mpf.plot(df, type='candle', volume=True, savefig='../data/trends/' + filename)

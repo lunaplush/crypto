@@ -23,8 +23,12 @@ import crypto_data_lib
 class Forecast:
     def __init__(self, symbol, date):
         self.name = date.strftime("%Y%m%d") + "-" + str(symbol)
-        self.path_model = os.path.join("data", "forecasts", self.name + ".json")
-        self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
+        if os.path.split(os.getcwd())[1] == "teleblt":
+            self.path_model = os.path.join("..", "data", "forecasts", self.name + ".json")
+            self.path_figure = os.path.join("..", "data", "forecasts", self.name + ".png")
+        else:
+            self.path_model = os.path.join("data", "forecasts", self.name + ".json")
+            self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
 
     def add_forecas_data(self, df):
         self.df = df
@@ -111,7 +115,29 @@ class TSPLinearRegression(TimeSeriesPrediction):
         y = self.get_column_as_array(col="price")
         return self.model.score(x, y)
 
-def make_prophet_model(predict_period = 14):
+def search_optimal_parameters(df):
+    params = {"changepoint_prior_scale": [0.01, 0.03, 0.05, 0.1, 1],
+              "seasonality_prior_scale": [2, 7, 10, 13, 15]
+              }
+
+    all_params = [dict(zip(params.keys(), t)) for t in itertools.product(*params.values())]
+
+    rmse_error = []
+    for pr in all_params:
+        model = Prophet(**pr).fit(df)
+        df_cv = cross_validation(model, initial="240 days", horizon="14 days", period="7 days", )
+        metrics = performance_metrics(df_cv)
+        rmse_error.append(metrics["rmse"].values[0])
+
+    tuning_results = pd.DataFrame(all_params)
+    tuning_results["rmse"] = rmse_error
+
+    best_params = all_params[np.argmin(rmse_error)]
+    print(best_params)
+    return best_params
+
+
+def make_prophet_model(symbol):
     try:
         df_raw = crypto_data_lib.get_yahoo(symbol)
         df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
@@ -126,35 +152,33 @@ def make_prophet_model(predict_period = 14):
         return None
 
 def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
-    
-    forecast = Forecast(symbol=symbol, date=date)
-
-    if not(os.path.isfile(forecast.path_model)):
-            model = make_prophet_model(period)
-        if model is None:
-            return None
-        else:
-            with open(forecast.path_model, "w") as f:
-                f.write(model_to_json(model))
-    else:
-        with open(forecast.path_model, "r") as f:
-            model = model_from_json(f.read())
-
-    future = model.make_future_dataframe(periods=period)
-    forecast_do = model.predict(future)
-
-    model.plot(forecast_do)
-    result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
-    result.set_index("ds", inplace=True)
-
-    for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
-        result[cl] = np.power(np.e, result[cl])
-
-    plt.savefig(forecast.path_figure, format="png")
-    forecast.add_forecas_data(result)
-    return forecast
     try:
-        pass
+        forecast = Forecast(symbol=symbol, date=date)
+
+        if not(os.path.isfile(forecast.path_model)):
+            model = make_prophet_model(symbol)
+            if model is None:
+                return None
+            else:
+               with open(forecast.path_model, "w") as f:
+                    f.write(model_to_json(model))
+        else:
+            with open(forecast.path_model, "r") as f:
+                model = model_from_json(f.read())
+
+        future = model.make_future_dataframe(periods=period)
+        forecast_do = model.predict(future)
+
+        model.plot(forecast_do)
+        result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
+        result.set_index("ds", inplace=True)
+
+        for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
+            result[cl] = np.power(np.e, result[cl])
+
+        plt.savefig(forecast.path_figure, format="png")
+        forecast.add_forecas_data(result)
+        return forecast
     except Exception:
         return None
 
@@ -188,11 +212,10 @@ if __name__ == "__main__":
     # print("sklearn Linear reg ", W, "\n")
 
     if True:
-        forecast = get_forecast(symbol="xpr-usd", date=datetime.datetime.now())
+        forecast = get_forecast(symbol="xrp-usd", date=datetime.datetime.now())
         forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
     else:
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
 
-    forecast = get_forecast(date=datetime.datetime.now())
     print(forecast.get_forecast_data())
