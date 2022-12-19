@@ -39,6 +39,28 @@ class Forecast:
         else:
             pd.DataFrame()
 
+    def get_path_figure(self):
+        if hasattr(self, "path_figure"):
+            if os.path.exists(self.path_figure):
+                return self.path_figure
+            else:
+                print("ERR:Forecast.path_figure.{}".format(self.path_figure))
+                return False
+        else:
+            print("ERR:Forecast.path_figure.{}".format(self.path_figure))
+            return False
+
+    def get_path_model(self):
+        if hasattr(self, "path_model"):
+            if os.path.exists(self.path_model):
+                return self.path_model
+            else:
+                print("ERR:Forecast.path_model.{}".format(self.path_model))
+                return False
+        else:
+            print("ERR:Forecast.path_model.{}".format(self.pathmodel))
+            return False
+
 
 
 
@@ -155,21 +177,24 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
     try:
         forecast = Forecast(symbol=symbol, date=date)
 
-        if not(os.path.isfile(forecast.path_model)):
+        if not(os.path.isfile(forecast.get_path_model())):
             model = make_prophet_model(symbol)
             if model is None:
+                print("Model not createt after make_prophet_model")
                 return None
             else:
-               with open(forecast.path_model, "w") as f:
+               with open(forecast.get_path_model(), "w") as f:
+                    print("Write new model to {}".format(forecast.get_path_model()))
                     f.write(model_to_json(model))
         else:
-            with open(forecast.path_model, "r") as f:
+            with open(forecast.get_path_model(), "r") as f:
                 model = model_from_json(f.read())
-
+            print("Get model from json {}".format(forecast.get_path_model()))
         future = model.make_future_dataframe(periods=period)
         forecast_do = model.predict(future)
 
         model.plot(forecast_do)
+        print("Do model.plot")
         result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
         result.set_index("ds", inplace=True)
 
@@ -211,11 +236,12 @@ if __name__ == "__main__":
     #
     # print("sklearn Linear reg ", W, "\n")
 
-    if True:
+    if False:
         forecast = get_forecast(symbol="xpr-usd", date=datetime.datetime.now())
         forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
     else:
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
+        print(forecast.get_path_figure())
 
     print(forecast.get_forecast_data())
