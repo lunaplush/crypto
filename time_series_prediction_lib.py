@@ -23,7 +23,7 @@ import crypto_data_lib
 class Forecast:
     def __init__(self, symbol, date):
         self.name = date.strftime("%Y%m%d") + "-" + str(symbol)
-        if os.path.split(os.getcwd())[1] == "teleblt":
+        if os.path.split(os.getcwd())[1] == "telebot":
             self.path_model = os.path.join("..", "data", "forecasts", self.name + ".json")
             self.path_figure = os.path.join("..", "data", "forecasts", self.name + ".png")
         else:
