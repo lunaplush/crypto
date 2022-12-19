@@ -16,7 +16,7 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
 
     #df = pdr.get_data_yahoo(stock, start , now)
     df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
-    #print(df.head())
+    print(df.head())
     #mpf.plot(df,type='candle',style='yahoo',savefig=filename)
     #mpf.plot(df, type='candle', style='yahoo', volume=True)
     mpf.plot(df, type='candle', volume=True, savefig='../data/trends/' + filename)

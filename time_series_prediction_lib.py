@@ -20,8 +20,8 @@ import crypto_data_lib
 class Forecast:
     def __init__(self, symbol, date):
         self.name = date.strftime("%Y%m%d") + "-" + str(symbol)
-        self.path_model = os.path.join("data", "forecasts", self.name + ".json")
-        self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
+        self.path_model = os.path.join("..", "data", "forecasts", self.name + ".json")
+        self.path_figure = os.path.join("..", "data", "forecasts", self.name + ".png")
 
     def add_forecas_data(self, df):
         self.df = df
@@ -108,9 +108,9 @@ class TSPLinearRegression(TimeSeriesPrediction):
         y = self.get_column_as_array(col="price")
         return self.model.score(x, y)
 
-def make_prophet_model(predict_period = 14):
+def make_prophet_model(symbol, predict_period = 14):
     try:
-        df_raw = crypto_data_lib.get_yahoo()
+        df_raw = crypto_data_lib.get_yahoo(symbol)
         df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
         df_raw.reset_index(inplace=True)
         df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
@@ -121,33 +121,35 @@ def make_prophet_model(predict_period = 14):
         return None
 
 def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
-    try:
-        forecast = Forecast(symbol=symbol, date=date)
+    
+    forecast = Forecast(symbol=symbol, date=date)
 
-        if not(os.path.isfile(forecast.path_model)):
-            model = make_prophet_model(period)
-            if model is None:
-                return None
-            else:
-               with open(forecast.path_model, "w") as f:
-                    f.write(model_to_json(model))
+    if not(os.path.isfile(forecast.path_model)):
+        model = make_prophet_model(symbol, period)
+        if model is None:
+            return None
         else:
-            with open(forecast.path_model, "r") as f:
-                model = model_from_json(f.read())
+            with open(forecast.path_model, "w") as f:
+                f.write(model_to_json(model))
+    else:
+        with open(forecast.path_model, "r") as f:
+            model = model_from_json(f.read())
 
-        future = model.make_future_dataframe(periods=period)
-        forecast_do = model.predict(future)
+    future = model.make_future_dataframe(periods=period)
+    forecast_do = model.predict(future)
 
-        model.plot(forecast_do)
-        result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
-        result.set_index("ds", inplace=True)
+    model.plot(forecast_do)
+    result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
+    result.set_index("ds", inplace=True)
 
-        for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
-            result[cl] = np.power(np.e, result[cl])
+    for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
+        result[cl] = np.power(np.e, result[cl])
 
-        plt.savefig(forecast.path_figure, format="png")
-        forecast.add_forecas_data(result)
-        return forecast
+    plt.savefig(forecast.path_figure, format="png")
+    forecast.add_forecas_data(result)
+    return forecast
+    try:
+        pass
     except Exception:
         return None
 
@@ -182,4 +184,5 @@ if __name__ == "__main__":
 
 
     forecast = get_forecast(date=datetime.datetime.now())
+
     print(forecast.get_forecast_data())
