@@ -3,6 +3,7 @@ import datetime
 
 import pandas as pd
 import pandas_datareader as pdr
+import yfinance as yf
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -120,7 +121,11 @@ class Period():
 
 
 def get_yahoo(symbol="btc-usd", period=Period(datetime.datetime.now()-datetime.timedelta(365), datetime.datetime.now())):
-        df = pdr.get_data_yahoo(symbol, period.begin, period.end)
+
+        #df = pdr.get_data_yahoo(symbol, period.begin, period.end)
+        df = yf.download(symbol, period.begin, period.end)
+        print(df)
+
         return df
 
 if __name__ == '__main__':

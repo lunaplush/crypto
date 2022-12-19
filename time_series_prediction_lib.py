@@ -1,6 +1,7 @@
 #Библиотека для прогнозирования
 import datetime
 import os
+import itertools
 
 import pandas as pd
 import numpy as np
@@ -13,6 +14,8 @@ import statsmodels
 from prophet.serialize import model_to_json, model_from_json
 from prophet import Prophet
 from prophet.plot import plot as plot_prophet
+from prophet.diagnostics import cross_validation, performance_metrics
+
 
 import crypto_data_lib
 import crypto_data_lib
@@ -20,8 +23,8 @@ import crypto_data_lib
 class Forecast:
     def __init__(self, symbol, date):
         self.name = date.strftime("%Y%m%d") + "-" + str(symbol)
-        self.path_model = os.path.join("..", "data", "forecasts", self.name + ".json")
-        self.path_figure = os.path.join("..", "data", "forecasts", self.name + ".png")
+        self.path_model = os.path.join("data", "forecasts", self.name + ".json")
+        self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
 
     def add_forecas_data(self, df):
         self.df = df
@@ -108,13 +111,15 @@ class TSPLinearRegression(TimeSeriesPrediction):
         y = self.get_column_as_array(col="price")
         return self.model.score(x, y)
 
-def make_prophet_model(symbol, predict_period = 14):
+def make_prophet_model(predict_period = 14):
     try:
         df_raw = crypto_data_lib.get_yahoo(symbol)
         df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
         df_raw.reset_index(inplace=True)
         df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
-        model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
+        good_params = search_optimal_parameters(df)
+        model = Prophet(**good_params).fit(df)
+        # model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
         return model
 
     except:
@@ -125,7 +130,7 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
     forecast = Forecast(symbol=symbol, date=date)
 
     if not(os.path.isfile(forecast.path_model)):
-        model = make_prophet_model(symbol, period)
+            model = make_prophet_model(period)
         if model is None:
             return None
         else:
@@ -182,7 +187,12 @@ if __name__ == "__main__":
     #
     # print("sklearn Linear reg ", W, "\n")
 
+    if True:
+        forecast = get_forecast(symbol="xpr-usd", date=datetime.datetime.now())
+        forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
+        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
+    else:
+        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
 
     forecast = get_forecast(date=datetime.datetime.now())
-
     print(forecast.get_forecast_data())
