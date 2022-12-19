@@ -1,6 +1,8 @@
 # В библиотеке будут собраны функции NLP для определения настроения новости.
 #https://github.com/crypto-sentiment/crypto_sentiment_tfidf_logreg_streamlit
 import sqlite3
+import time
+
 import pandas as pd
 import yaml
 import pickle
@@ -56,6 +58,8 @@ def get_news():
     return df_news
 
 if __name__=="__main__":
+    time_start = time.time()
+
     print("Check sentimental analyis")
 
     # loading config params
@@ -76,3 +80,5 @@ if __name__=="__main__":
         a = model_inference(model, i[1].title)
         b =  pipe(i[1].title)
         print(i[0], "\t",  i[1].title, "\t", a, "\t", mod_BERT_result(b))
+
+    print(time.time()-time_start)

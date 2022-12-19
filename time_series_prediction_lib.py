@@ -211,9 +211,11 @@ if __name__ == "__main__":
     #
     # print("sklearn Linear reg ", W, "\n")
 
-
-  #  forecast = get_forecast(symbol="xpr-usd", date=datetime.datetime.now())
-    #forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
-    forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
+    if True:
+        forecast = get_forecast(symbol="xpr-usd", date=datetime.datetime.now())
+        forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
+        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
+    else:
+        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
 
     print(forecast.get_forecast_data())
