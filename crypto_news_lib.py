@@ -57,6 +57,11 @@ def get_news():
     db.close()
     return df_news
 
+def get_sentiment(news):
+    pass
+    return 1
+
+
 if __name__=="__main__":
     time_start = time.time()
 

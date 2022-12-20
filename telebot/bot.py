@@ -17,6 +17,7 @@ from time_series_prediction_lib import get_forecast, Forecast
 
 
 
+
 NEWS_LIMIT = 10
 #keyword = ''
 start_position = 0
