@@ -175,6 +175,7 @@ def make_prophet_model(symbol):
 
 def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
     try:
+        symbol = symbol.lower()
         forecast = Forecast(symbol=symbol, date=date)
 
         if not(os.path.isfile(forecast.get_path_model())):
