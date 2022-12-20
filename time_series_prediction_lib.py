@@ -161,6 +161,7 @@ def search_optimal_parameters(df):
 
 def make_prophet_model(symbol):
     try:
+        symbol = symbol.lower()
         df_raw = crypto_data_lib.get_yahoo(symbol)
         df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
         df_raw.reset_index(inplace=True)
