@@ -216,7 +216,8 @@ def command_news(message):
     global asset
     symbol = asset+"-USD"
     bot.send_message(message.chat.id, 'Wait a minute...')
-    forecast = get_forecast(symbol, date=datetime.now())
+    forecast = get_forecast(symbol, date=datetime.now(), time_reduce=True)
+
     if forecast is not None:
         #print(forecast.path_figure)
         photo = open(forecast.path_figure, 'rb')

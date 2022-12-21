@@ -41,24 +41,16 @@ class Forecast:
 
     def get_path_figure(self):
         if hasattr(self, "path_figure"):
-            if os.path.exists(self.path_figure):
-                return self.path_figure
-            else:
-                print("ERR:Forecast.path_figure.{}".format(self.path_figure))
-                return False
+            return self.path_figure
         else:
-            print("ERR:Forecast.path_figure.{}".format(self.path_figure))
+            print("ERR:  В Forecast не задан path_figure")
             return False
 
     def get_path_model(self):
         if hasattr(self, "path_model"):
-            if os.path.exists(self.path_model):
-                return self.path_model
-            else:
-                print("ERR:Forecast.path_model.{}".format(self.path_model))
-                return False
+            return self.path_model
         else:
-            print("ERR:Forecast.path_model.{}".format(self.pathmodel))
+            print("ERR:  в Forecast не задан path_model")
             return False
 
 
@@ -159,28 +151,30 @@ def search_optimal_parameters(df):
     return best_params
 
 
-def make_prophet_model(symbol):
+def make_prophet_model(symbol, time_reduce=False):
     try:
         symbol = symbol.lower()
         df_raw = crypto_data_lib.get_yahoo(symbol)
         df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
         df_raw.reset_index(inplace=True)
         df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
-        good_params = search_optimal_parameters(df)
-        model = Prophet(**good_params).fit(df)
+        if time_reduce:
+            model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
+        else:
+            good_params = search_optimal_parameters(df)
+            model = Prophet(**good_params).fit(df)
         # model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
         return model
 
     except:
         return None
 
-def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
+def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time_reduce=False):
     try:
         symbol = symbol.lower()
         forecast = Forecast(symbol=symbol, date=date)
-
         if not(os.path.isfile(forecast.get_path_model())):
-            model = make_prophet_model(symbol)
+            model = make_prophet_model(symbol, time_reduce)
             if model is None:
                 print("Model not createt after make_prophet_model")
                 return None
@@ -243,7 +237,7 @@ if __name__ == "__main__":
         forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
     else:
-        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
+        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now(), time_reduce=True)
         print(forecast.get_path_figure())
 
     print(forecast.get_forecast_data())
