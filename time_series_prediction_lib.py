@@ -44,10 +44,10 @@ class Forecast:
             if os.path.exists(self.path_figure):
                 return self.path_figure
             else:
-                print("ERR:Forecast.path_figure.{}".format(self.path_figure))
+                print("ERR:Forecast.path_figure: {}".format(self.path_figure))
                 return False
         else:
-            print("ERR:Forecast.path_figure.{}".format(self.path_figure))
+            print("ERR:Forecast.path_figure: {}".format(self.path_figure))
             return False
 
     def get_path_model(self):
@@ -55,10 +55,10 @@ class Forecast:
             if os.path.exists(self.path_model):
                 return self.path_model
             else:
-                print("ERR:Forecast.path_model.{}".format(self.path_model))
+                print("ERR:Forecast.path_model: {}".format(self.path_model))
                 return False
         else:
-            print("ERR:Forecast.path_model.{}".format(self.pathmodel))
+            print("ERR:Forecast.path_model: {}".format(self.pathmodel))
             return False
 
 
@@ -173,10 +173,23 @@ def make_prophet_model(symbol):
     except:
         return None
 
-def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
+def get_forecast(symbol="btc-usd", date=datetime.datetime.now()):
     try:
         forecast = Forecast(symbol=symbol, date=date)
+        #print(forecast.get_path_model())
+        if not(os.path.isfile(forecast.get_path_model())):
+            
+            print("File doesn't exist")
+            model = make_prophet_model(symbol)
+            print(model)
+        else:
+            print('File exists')
 
+        return forecast
+
+        """
+        forecast = Forecast(symbol=symbol, date=date)
+        
         if not(os.path.isfile(forecast.get_path_model())):
             model = make_prophet_model(symbol)
             if model is None:
@@ -204,6 +217,7 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14):
         plt.savefig(forecast.path_figure, format="png")
         forecast.add_forecas_data(result)
         return forecast
+        """
     except Exception:
         return None
 
