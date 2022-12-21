@@ -57,6 +57,15 @@ def get_news():
     db.close()
     return df_news
 
+def get_sentiment(n):
+    text ="bitcoin"
+    a = model_inference(model, i[1].title)
+    b = pipe(i[1].title)
+    print(i[0], "\t", i[1].title, "\t", a, "\t", mod_BERT_result(b))
+
+    return 1
+
+
 if __name__=="__main__":
     time_start = time.time()
 

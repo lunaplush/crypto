@@ -1,4 +1,5 @@
 import os
+import time
 
 import telebot
 from telebot import types
@@ -14,6 +15,7 @@ import trends
 
 #from time_series_prediction_lib import Forecast
 from time_series_prediction_lib import get_forecast, Forecast
+
 
 
 
@@ -215,11 +217,14 @@ def command_news(message):
     global asset
     symbol = asset+"-USD"
     bot.send_message(message.chat.id, 'Wait a minute...')
-    forecast = get_forecast(symbol, date=datetime.now())
+    start_time = time.time()
+    forecast = get_forecast(symbol, date=datetime.now(), time_reduce=False)
+    print("Прогоз занял {}".format(time.time()-start_time))
     if forecast is not None:
         #print(forecast.path_figure)
         photo = open(forecast.path_figure, 'rb')
         bot.send_photo(message.chat.id, photo)
+        bot.send_message(message.chat.id, forecast.get_forecast_data_formatted())
     else:
         bot.send_message(message.chat.id, 'There is no prediction... Sorry')
 

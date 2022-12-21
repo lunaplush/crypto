@@ -1,4 +1,5 @@
 import sqlite3
+from crypto_news_lib import get_sentiment
 
 class SQLighter:
 
@@ -13,7 +14,12 @@ class SQLighter:
             sql = f"SELECT * FROM news WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
         
         with self.connection:
-            return self.cursor.execute(sql)
+            # ТУТ нужно оценить настроение новости
+            #for n in news:
+            #    get_sentiment(n)
+            result = self.cursor.execute(sql)
+            print(result)
+            return result
 
     def close(self):
         self.connection.close()

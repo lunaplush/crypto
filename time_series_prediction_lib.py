@@ -30,7 +30,7 @@ class Forecast:
             self.path_model = os.path.join("data", "forecasts", self.name + ".json")
             self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
 
-    def add_forecas_data(self, df):
+    def add_forecast_data(self, df):
         self.df = df
 
     def get_forecast_data(self):
@@ -39,26 +39,31 @@ class Forecast:
         else:
             pd.DataFrame()
 
+    def get_forecast_data_formatted(self):
+        if hasattr(self, "df"):
+            forecast_text = "Прогноз на 14 дней :\n"
+            for i in self.df.index:
+                forecast_text += "{} курс будет около {:d}, но не меньше {:d} " \
+                                 "и не больше {:d}".format(i.strftime("%d-%m-%Y"), int(self.df.loc[i]["yhat"]),
+                                                           int(self.df.loc[i]["yhat_lower"]),
+                                                           int(self.df.loc[i]["yhat_upper"]))+"\n"
+            return forecast_text
+        else:
+            pd.DataFrame()
+
+
     def get_path_figure(self):
         if hasattr(self, "path_figure"):
-            if os.path.exists(self.path_figure):
-                return self.path_figure
-            else:
-                print("ERR:Forecast.path_figure: {}".format(self.path_figure))
-                return False
+            return self.path_figure
         else:
-            print("ERR:Forecast.path_figure: {}".format(self.path_figure))
+            print("ERR:  В Forecast не задан path_figure")
             return False
 
     def get_path_model(self):
         if hasattr(self, "path_model"):
-            if os.path.exists(self.path_model):
-                return self.path_model
-            else:
-                print("ERR:Forecast.path_model: {}".format(self.path_model))
-                return False
+            return self.path_model
         else:
-            print("ERR:Forecast.path_model: {}".format(self.pathmodel))
+            print("ERR:  в Forecast не задан path_model")
             return False
 
 
@@ -159,39 +164,30 @@ def search_optimal_parameters(df):
     return best_params
 
 
-def make_prophet_model(symbol):
+def make_prophet_model(symbol, time_reduce=False):
     try:
+        symbol = symbol.lower()
         df_raw = crypto_data_lib.get_yahoo(symbol)
         df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
         df_raw.reset_index(inplace=True)
         df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
-        good_params = search_optimal_parameters(df)
-        model = Prophet(**good_params).fit(df)
+        if time_reduce:
+            model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
+        else:
+            good_params = search_optimal_parameters(df)
+            model = Prophet(**good_params).fit(df)
         # model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
         return model
 
     except:
         return None
 
-def get_forecast(symbol="btc-usd", date=datetime.datetime.now()):
+def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time_reduce=False):
     try:
+        symbol = symbol.lower()
         forecast = Forecast(symbol=symbol, date=date)
-        #print(forecast.get_path_model())
         if not(os.path.isfile(forecast.get_path_model())):
-            
-            print("File doesn't exist")
-            model = make_prophet_model(symbol)
-            print(model)
-        else:
-            print('File exists')
-
-        return forecast
-
-        """
-        forecast = Forecast(symbol=symbol, date=date)
-        
-        if not(os.path.isfile(forecast.get_path_model())):
-            model = make_prophet_model(symbol)
+            model = make_prophet_model(symbol, time_reduce)
             if model is None:
                 print("Model not createt after make_prophet_model")
                 return None
@@ -215,9 +211,8 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now()):
             result[cl] = np.power(np.e, result[cl])
 
         plt.savefig(forecast.path_figure, format="png")
-        forecast.add_forecas_data(result)
+        forecast.add_forecast_data(result)
         return forecast
-        """
     except Exception:
         return None
 
@@ -255,7 +250,7 @@ if __name__ == "__main__":
         forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
     else:
-        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
+        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now(), time_reduce=True)
         print(forecast.get_path_figure())
 
-    print(forecast.get_forecast_data())
+    print(str(forecast.get_forecast_data_formatted()))
