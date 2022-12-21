@@ -30,7 +30,7 @@ class Forecast:
             self.path_model = os.path.join("data", "forecasts", self.name + ".json")
             self.path_figure = os.path.join("data", "forecasts", self.name + ".png")
 
-    def add_forecas_data(self, df):
+    def add_forecast_data(self, df):
         self.df = df
 
     def get_forecast_data(self):
@@ -38,6 +38,19 @@ class Forecast:
             return self.df
         else:
             pd.DataFrame()
+
+    def get_forecast_data_formatted(self):
+        if hasattr(self, "df"):
+            forecast_text = "Прогноз на 14 дней :\n"
+            for i in self.df.index:
+                forecast_text += "{} курс будет около {:d}, но не меньше {:d} " \
+                                 "и не больше {:d}".format(i.strftime("%d-%m-%Y"), int(self.df.loc[i]["yhat"]),
+                                                           int(self.df.loc[i]["yhat_lower"]),
+                                                           int(self.df.loc[i]["yhat_upper"]))+"\n"
+            return forecast_text
+        else:
+            pd.DataFrame()
+
 
     def get_path_figure(self):
         if hasattr(self, "path_figure"):
@@ -198,7 +211,7 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
             result[cl] = np.power(np.e, result[cl])
 
         plt.savefig(forecast.path_figure, format="png")
-        forecast.add_forecas_data(result)
+        forecast.add_forecast_data(result)
         return forecast
     except Exception:
         return None
@@ -240,4 +253,4 @@ if __name__ == "__main__":
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now(), time_reduce=True)
         print(forecast.get_path_figure())
 
-    print(forecast.get_forecast_data())
+    print(str(forecast.get_forecast_data_formatted()))

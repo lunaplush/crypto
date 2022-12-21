@@ -17,7 +17,9 @@ class SQLighter:
             # ТУТ нужно оценить настроение новости
             #for n in news:
             #    get_sentiment(n)
-            return self.cursor.execute(sql)
+            result = self.cursor.execute(sql)
+            print(result)
+            return result
 
     def close(self):
         self.connection.close()
