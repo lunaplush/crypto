@@ -24,7 +24,7 @@ NEWS_LIMIT = 10
 start_position = 0
 
 bot = telebot.TeleBot(config.TOKEN, parse_mode='HTML')
-db = SQLighter('../db/news.sqlite')
+db = SQLighter(config.PATH_TO_DB)
 
 """
 def getMainMenu():
@@ -114,7 +114,7 @@ def send_news_next(message):
 
 
 def get_news(keyword, limit, start_position):
-    news = db.get_news(keyword, limit, start_position).fetchall()
+    news = db.get_news(keyword, limit, start_position)
     strNews = f'<b>{keyword}</b>\n-------------------------\n'
     for snews in news:
         strNews+= datetime.utcfromtimestamp(int(snews[3])/1000).strftime('%d.%m.%Y %H:%M') + f" ({snews[5]})" +'\n'

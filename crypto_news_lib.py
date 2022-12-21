@@ -40,6 +40,8 @@ def mod_BERT_result(b):
             k = 0
         b1[k] = i["score"]
     return b1
+
+
 def model_inference(model, input_text):
 
     pred = model.predict_proba([input_text])
@@ -47,7 +49,6 @@ def model_inference(model, input_text):
     pred_dict = {}
     for i, pred in enumerate(pred.squeeze()):
         pred_dict[i] = pred
-
     return pred_dict
 
 def get_news():
@@ -62,8 +63,14 @@ def get_sentiment(n):
     a = model_inference(model, i[1].title)
     b = pipe(i[1].title)
     print(i[0], "\t", i[1].title, "\t", a, "\t", mod_BERT_result(b))
-
     return 1
+
+def getModel():
+    # loading config params
+    project_root: Path = get_project_root()
+    with open(str(project_root / "config.yml")) as f:
+        params = yaml.load(f, Loader=yaml.FullLoader)
+    return load_model(params["model"]["path_to_model"])
 
 
 if __name__=="__main__":
@@ -71,11 +78,7 @@ if __name__=="__main__":
 
     print("Check sentimental analyis")
 
-    # loading config params
-    project_root: Path = get_project_root()
-    with open(str(project_root / "config.yml")) as f:
-        params = yaml.load(f, Loader=yaml.FullLoader)
-    model = load_model(params["model"]["path_to_model"])
+    model = getModel()
 
     model_name = "ElKulako/cryptobert"
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)

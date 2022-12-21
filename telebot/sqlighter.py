@@ -1,3 +1,6 @@
+import sys
+sys.path.append("..")
+
 import sqlite3
 from crypto_news_lib import get_sentiment
 
@@ -17,7 +20,7 @@ class SQLighter:
             # ТУТ нужно оценить настроение новости
             #for n in news:
             #    get_sentiment(n)
-            result = self.cursor.execute(sql)
+            result = self.cursor.execute(sql).fetchall()
             print(result)
             return result
 
