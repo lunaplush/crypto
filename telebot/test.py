@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.append("..")
 
@@ -9,6 +10,10 @@ import datetime
 from sqlighter import SQLighter
 
 #from time_series_prediction_lib import get_forecast, Forecast
+import crypto_news_lib as cn
+from crypto_news_lib import get_sentiment
+
+
 
 
 """
@@ -24,13 +29,41 @@ forecast = get_forecast(symbol, date=datetime.datetime.now())
 #print(df.head())
 #mpf.plot(df, type='candle', volume=True)
 
+
 keyword = "btc"
-limit = 10
+limit = 5
 start_position = 0
 
 db = SQLighter(config.PATH_TO_DB)
 news = db.get_news(keyword, limit, start_position)
 #print(news)
 
+data = []
+
+
 for snews in news:
-    print(snews[1])
+    objData = {}
+    url = snews[0]
+    title = snews[1]
+    #print(url)
+    print(title)
+    sentiment = get_sentiment(title)
+    print(sentiment)
+    sentiment_tf_idf = sentiment['sentiment_tf_idf']
+    
+    """
+    objData['url'] = url
+    objData['negative'] = sentiment_tf_idf[0]
+    objData['neutral'] = sentiment_tf_idf[1]
+    objData['positive'] = sentiment_tf_idf[2]
+
+    sql = f"INSERT OR IGNORE INTO sentiment VALUES('{objData['url']}', {objData['negative']}, {objData['neutral']}, {objData['positive']})"
+    result = db.insertRow(sql)
+    print(result)
+    """
+
+    #print(get_sentiment(title))
+    #data.append((url, sentiment_tf_idf[0], sentiment_tf_idf[1], sentiment_tf_idf[2]))
+
+#print(data)
+#db.insertData(data)

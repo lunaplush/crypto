@@ -20,9 +20,44 @@ class SQLighter:
             # ТУТ нужно оценить настроение новости
             #for n in news:
             #    get_sentiment(n)
+            
             result = self.cursor.execute(sql).fetchall()
-            print(result)
+            #print(result)
             return result
+    """
+    def insertData(self, data):
+        try:
+            self.cursor.executemany("INSERT OR IGNORE INTO sentiment VALUES(?, ?, ?, ?)", data)
+            result = self.connection.commit()
+            print(result)
+        except Exception as e:
+                if hasattr(e, 'message'):
+                    print(f"1: {e.message}")
+                else:
+                    print(f"2: {e}")
+    """
+
+
+    def insertRow(self, sql):
+        """
+        print(data['url'])
+        print(data['negative'])
+        print(data['neutral'])
+        print(data['positive'])
+        """
+        try:
+            print(sql)
+            self.cursor.execute(sql)
+            result = self.connection.commit()
+            #print(result)
+            return result
+        except Exception as e:
+            if hasattr(e, 'message'):
+                print(f"1: {e.message}")
+            else:
+                print(f"2: {e}")
+
+
 
     def close(self):
         self.connection.close()

@@ -2,6 +2,7 @@
 #https://github.com/crypto-sentiment/crypto_sentiment_tfidf_logreg_streamlit
 import sqlite3
 import time
+import os
 
 import pandas as pd
 import yaml
@@ -34,9 +35,9 @@ def mod_BERT_result(b):
     for i in b[0]:
         if i["label"] == 'Neutral':
             k = 1
-        if i["label"] == "Bullish":
+        if i["label"] == "Bullish": #Positive
             k = 2
-        if i["label"] == "Bearish":
+        if i["label"] == "Bearish": #Negative
             k = 0
         b1[k] = i["score"]
     return b1
@@ -53,44 +54,126 @@ def model_inference(model, input_text):
 
 def get_news():
     db = sqlite3.connect("db/news.sqlite")
-    sqlite_select_query="SELECT * FROM 'news' WHERE language='en' LIMIT 0, 10"
+    sqlite_select_query = "SELECT * FROM 'news' WHERE language='en' LIMIT 0, 10"
     df_news = pd.read_sql(sqlite_select_query, db)
     db.close()
     return df_news
 
-def get_sentiment(n):
-    text ="bitcoin"
-    a = model_inference(model, i[1].title)
-    b = pipe(i[1].title)
-    print(i[0], "\t", i[1].title, "\t", a, "\t", mod_BERT_result(b))
-    return 1
 
-def getModel():
-    # loading config params
-    project_root: Path = get_project_root()
-    with open(str(project_root / "config.yml")) as f:
-        params = yaml.load(f, Loader=yaml.FullLoader)
-    return load_model(params["model"]["path_to_model"])
+
+
+
+class Sentiment():
+    def __init__(self, tf_idf=True, bert=True ):
+        if tf_idf:
+            # loading config params
+            project_root: Path = get_project_root()
+            with open(str(project_root / "config.yml")) as f:
+                params = yaml.load(f, Loader=yaml.FullLoader)
+
+            path_to_model = params["model"]["path_to_model"]
+
+            if os.path.split(os.getcwd())[1] == "telebot":
+                path_to_model = os.path.join("..", path_to_model)
+
+            #self.model_tf_idf = load_model(params["model"]["path_to_model"])
+            self.model_tf_idf = load_model(path_to_model)
+
+
+        if bert:
+            model_name = "ElKulako/cryptobert"
+            tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+            self.model_bert = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
+            self.pipe_bert = TextClassificationPipeline(model=self.model_bert, tokenizer=tokenizer, max_length=64,
+                                              truncation=True, padding='max_length', top_k=None)
+
+    def do_sentiment_analysis(self, news):
+        """
+        Crypro-sentimental  tf-idf
+        0: Negative
+        1: Neutral
+        2: Positive
+        """
+        data = {}
+
+        if hasattr(self, "model_tf_idf"):
+            self.sentiment_tf_idf = model_inference(self.model_tf_idf, news)
+            #print(f"sentiment_tf_idf: {self.sentiment_tf_idf}")
+            data['sentiment_tf_idf'] = self.sentiment_tf_idf
+
+            for k in self.sentiment_tf_idf:
+                self.sentiment_tf_idf[k] = round(self.sentiment_tf_idf[k], 2)
+
+
+        if hasattr(self, "model_bert"):
+            self.sentiment_bert =mod_BERT_result(self.pipe_bert(news))
+            #print(f"sentiment_bert: {self.sentiment_bert}")
+            data['sentiment_bert'] = self.sentiment_bert
+
+        
+
+            for k in self.sentiment_bert:
+                self.sentiment_bert[k] = round(self.sentiment_bert[k], 2)
+
+        return data
+
+
+"""
+        if hasattr(self, "sentiment_bert") and hasattr(self, "sentiment_tf_idf"):
+            result = list(zip(["Negative:", "Neutral:", "Positive"],
+                              [self.sentiment_tf_idf[0], self.sentiment_tf_idf[1], self.sentiment_tf_idf[2]],
+                              [self.sentiment_bert[0], self.sentiment_bert[1], self.sentiment_bert[2]]))
+            return result
+
+
+        if hasattr(self, "sentiment_bert"):
+            return self.sentiment_bert
+
+        if hasattr(self, "sentiment_tf_idf"):
+            return self.sentiment_tf_idf
+
+        else:
+            return {0: 0, 1: 0, 2: 1}
+"""
+
+
+
+
+
+def get_sentiment(news):
+
+    sentiment = Sentiment(tf_idf=True, bert=True)
+    answer = sentiment.do_sentiment_analysis(news)
+
+    return answer
 
 
 if __name__=="__main__":
-    time_start = time.time()
-
-    print("Check sentimental analyis")
-
-    model = getModel()
-
-    model_name = "ElKulako/cryptobert"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
-    model2 = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
-    pipe = TextClassificationPipeline(model=model2, tokenizer=tokenizer, max_length=64,
-                                      truncation=True, padding='max_length', top_k=None)
-
+    # time_start = time.time()
+    #
+    # print("Check sentimental analyis")
+    #
+    # # loading config params
+    # project_root: Path = get_project_root()
+    # with open(str(project_root / "config.yml")) as f:
+    #     params = yaml.load(f, Loader=yaml.FullLoader)
+    # model = load_model(params["model"]["path_to_model"])
+    #
+    # model_name = "ElKulako/cryptobert"
+    # tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+    # model2 = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
+    # pipe = TextClassificationPipeline(model=model2, tokenizer=tokenizer, max_length=64,
+    #                                   truncation=True, padding='max_length', top_k=None)
+    #
+    # df = get_news()
+    #
+    # for i in df.iterrows():
+    #     a = model_inference(model, i[1].title)
+    #     b =  pipe(i[1].title)
+    #     print(i[0], "\t",  i[1].title, "\t", a, "\t", mod_BERT_result(b))
+    #
+    # print(time.time()-time_start)
     df = get_news()
-
     for i in df.iterrows():
-        a = model_inference(model, i[1].title)
-        b =  pipe(i[1].title)
-        print(i[0], "\t",  i[1].title, "\t", a, "\t", mod_BERT_result(b))
-
-    print(time.time()-time_start)
+        print(i[1].title, get_sentiment(i[1].title))
+        #print(get_sentiment(i[1].title))
