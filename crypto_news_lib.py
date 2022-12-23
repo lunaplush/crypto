@@ -149,31 +149,34 @@ def get_sentiment(news):
 
 
 if __name__=="__main__":
-    # time_start = time.time()
-    #
-    # print("Check sentimental analyis")
-    #
-    # # loading config params
-    # project_root: Path = get_project_root()
-    # with open(str(project_root / "config.yml")) as f:
-    #     params = yaml.load(f, Loader=yaml.FullLoader)
-    # model = load_model(params["model"]["path_to_model"])
-    #
-    # model_name = "ElKulako/cryptobert"
-    # tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
-    # model2 = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
-    # pipe = TextClassificationPipeline(model=model2, tokenizer=tokenizer, max_length=64,
-    #                                   truncation=True, padding='max_length', top_k=None)
-    #
-    # df = get_news()
-    #
-    # for i in df.iterrows():
-    #     a = model_inference(model, i[1].title)
-    #     b =  pipe(i[1].title)
-    #     print(i[0], "\t",  i[1].title, "\t", a, "\t", mod_BERT_result(b))
-    #
-    # print(time.time()-time_start)
+    time_start = time.time()
+
+    print("Check sentimental analyis")
+    # loading config params
+    project_root: Path = get_project_root()
+    with open(str(project_root / "config.yml")) as f:
+        params = yaml.load(f, Loader=yaml.FullLoader)
+    model = load_model(params["model"]["path_to_model"])
+
+    model_name = "ElKulako/cryptobert"
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+    model2 = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
+    pipe = TextClassificationPipeline(model=model2, tokenizer=tokenizer, max_length=64,
+                                      truncation=True, padding='max_length', top_k=None)
+
     df = get_news()
+
     for i in df.iterrows():
-        print(i[1].title, get_sentiment(i[1].title))
-        #print(get_sentiment(i[1].title))
+        time_start=time.time()
+        a = model_inference(model, i[1].title)
+        time1=time.time()
+        print(time1-time_start)
+        b =  pipe(i[1].title)
+        print(time.time()-time1)
+        print(i[0], "\t",  i[1].title, "\t", a, "\t", mod_BERT_result(b))
+
+    print(time.time()-time_start)
+    # df = get_news()
+    # for i in df.iterrows():
+    #     print(i[1].title, get_sentiment(i[1].title))
+    #     #print(get_sentiment(i[1].title))
