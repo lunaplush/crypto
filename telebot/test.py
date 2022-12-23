@@ -11,7 +11,7 @@ from sqlighter import SQLighter
 
 #from time_series_prediction_lib import get_forecast, Forecast
 import crypto_news_lib as cn
-from crypto_news_lib import get_sentiment
+from crypto_news_lib import get_sentiment, Sentiment
 
 
 
@@ -39,7 +39,7 @@ news = db.get_news(keyword, limit, start_position)
 #print(news)
 
 data = []
-
+sentiment = Sentiment()
 
 for snews in news:
     objData = {}

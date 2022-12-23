@@ -30,18 +30,6 @@ def load_model(model_path):
         model = pickle.load(f)
     return model
 
-def mod_BERT_result(b):
-    b1 = {}
-    for i in b[0]:
-        if i["label"] == 'Neutral':
-            k = 1
-        if i["label"] == "Bullish": #Positive
-            k = 2
-        if i["label"] == "Bearish": #Negative
-            k = 0
-        b1[k] = i["score"]
-    return b1
-
 
 def model_inference(model, input_text):
 
@@ -106,7 +94,7 @@ class Sentiment():
 
 
         if hasattr(self, "model_bert"):
-            self.sentiment_bert =mod_BERT_result(self.pipe_bert(news))
+            self.sentiment_bert =self.mod_BERT_result(self.pipe_bert(news))
             #print(f"sentiment_bert: {self.sentiment_bert}")
             data['sentiment_bert'] = self.sentiment_bert
 
@@ -118,24 +106,26 @@ class Sentiment():
         return data
 
 
-"""
-        if hasattr(self, "sentiment_bert") and hasattr(self, "sentiment_tf_idf"):
-            result = list(zip(["Negative:", "Neutral:", "Positive"],
-                              [self.sentiment_tf_idf[0], self.sentiment_tf_idf[1], self.sentiment_tf_idf[2]],
-                              [self.sentiment_bert[0], self.sentiment_bert[1], self.sentiment_bert[2]]))
-            return result
+    def do_sentiment_analysis_by_model(self, news, model):
+        if model == "tf_idf" and hasattr(self, "model_tf_idf"):
+            return model_inference(self.model_tf_idf, news)
 
+        if model == "bert" and hasattr(self, "model_bert"):
+            return self.mod_BERT_result(self.pipe_bert(news))
 
-        if hasattr(self, "sentiment_bert"):
-            return self.sentiment_bert
+        return None
 
-        if hasattr(self, "sentiment_tf_idf"):
-            return self.sentiment_tf_idf
-
-        else:
-            return {0: 0, 1: 0, 2: 1}
-"""
-
+    def mod_BERT_result(self, b):
+        b1 = {}
+        for i in b[0]:
+            if i["label"] == 'Neutral':
+                k = 1
+            if i["label"] == "Bullish":  # Positive
+                k = 2
+            if i["label"] == "Bearish":  # Negative
+                k = 0
+            b1[k] = i["score"]
+        return b1
 
 
 
@@ -149,31 +139,20 @@ def get_sentiment(news):
 
 
 if __name__=="__main__":
-    time_start = time.time()
 
-    print("Check sentimental analyis")
-    # loading config params
-    project_root: Path = get_project_root()
-    with open(str(project_root / "config.yml")) as f:
-        params = yaml.load(f, Loader=yaml.FullLoader)
-    model = load_model(params["model"]["path_to_model"])
 
-    model_name = "ElKulako/cryptobert"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
-    model2 = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
-    pipe = TextClassificationPipeline(model=model2, tokenizer=tokenizer, max_length=64,
-                                      truncation=True, padding='max_length', top_k=None)
-
+    sentiment=Sentiment()
     df = get_news()
 
     for i in df.iterrows():
+        news=i[1].title
         time_start=time.time()
-        a = model_inference(model, i[1].title)
+        a = sentiment.do_sentiment_analysis_by_model(news, "tf_idf")
         time1=time.time()
         print(time1-time_start)
-        b =  pipe(i[1].title)
+        b = sentiment.do_sentiment_analysis_by_model(news, "bert")
         print(time.time()-time1)
-        print(i[0], "\t",  i[1].title, "\t", a, "\t", mod_BERT_result(b))
+        print(i[0], "\t",  news, "\t tf-idf:", a[0], a[1], a[2], "\t bert:", b[0], b[1], b[2])
 
     print(time.time()-time_start)
     # df = get_news()
