@@ -15,7 +15,7 @@ from crypto_news_lib import get_sentiment, Sentiment
 
 
 
-
+sentiment=Sentiment()
 """
 symbol = 'BTC-USD'
 startDate = '2021-01-01'
@@ -31,7 +31,7 @@ forecast = get_forecast(symbol, date=datetime.datetime.now())
 
 
 keyword = "btc"
-limit = 5
+limit = 1
 start_position = 0
 
 db = SQLighter(config.PATH_TO_DB)
@@ -47,9 +47,14 @@ for snews in news:
     title = snews[1]
     #print(url)
     print(title)
-    sentiment = get_sentiment(title)
-    print(sentiment)
-    sentiment_tf_idf = sentiment['sentiment_tf_idf']
+    #sentiment = get_sentiment(title)
+    #print(sentiment)
+    #sentiment_tf_idf = sentiment['sentiment_tf_idf']
+    tf_idf = sentiment.do_sentiment_analysis_by_model(title, "tf_idf")
+    print(tf_idf)
+    bert = sentiment.do_sentiment_analysis_by_model(title, "bert")
+    print(bert)
+    
     
     """
     objData['url'] = url

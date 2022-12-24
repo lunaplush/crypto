@@ -12,7 +12,7 @@ class SQLighter:
 
     def get_news(self, keyword="", limit=1, start_position = 0, status=True):
         if(keyword == ""):
-            sql = "SELECT * FROM news ORDER BY date LIMIT 0, 10"
+            sql = f"SELECT * FROM news ORDER BY date LIMIT {start_position}, {limit}"
         else:
             sql = f"SELECT * FROM news WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
         
@@ -24,6 +24,13 @@ class SQLighter:
             result = self.cursor.execute(sql).fetchall()
             #print(result)
             return result
+
+
+
+    def query(self, sql):      
+        with self.connection:
+            return self.cursor.execute(sql).fetchall()
+
     """
     def insertData(self, data):
         try:
