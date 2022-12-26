@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 import sqlite3
-from crypto_news_lib import get_sentiment
+from crypto_news_tf_idf_lib import Sentiment
 
 class SQLighter:
 
