@@ -10,8 +10,8 @@ import datetime
 from sqlighter import SQLighter
 
 #from time_series_prediction_lib import get_forecast, Forecast
-import crypto_news_lib as cn
-from crypto_news_lib import get_sentiment, Sentiment
+#import crypto_news_lib as cn
+from crypto_news_tf_idf_lib import Sentiment
 
 
 
@@ -53,7 +53,7 @@ for snews in news:
     #sentiment_tf_idf = sentiment['sentiment_tf_idf']
     #tf_idf = sentiment.do_sentiment_analysis_by_model(title, "tf_idf")
     #print(tf_idf)
-    data = sentiment.do_sentiment_analysis_by_model(title, model_name)
+    data = sentiment.do_sentiment_analysis(title)
     print(data)
     
     
@@ -62,14 +62,9 @@ for snews in news:
     objData['negative'] = data[0]
     objData['neutral'] = data[1]
     objData['positive'] = data[2]
-
+    print(objData)
+"""
     sql = f"INSERT OR IGNORE INTO {model_name} VALUES('{objData['url']}', {objData['negative']}, {objData['neutral']}, {objData['positive']})"
     result = db.insertRow(sql)
     print(result)
-    
-
-    #print(get_sentiment(title))
-    #data.append((url, sentiment_tf_idf[0], sentiment_tf_idf[1], sentiment_tf_idf[2]))
-
-#print(data)
-#db.insertData(data)
+"""
