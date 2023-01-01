@@ -8,13 +8,16 @@ class SQLighter:
 
     def __init__(self, database_file):
         self.connection = sqlite3.connect(database_file, check_same_thread=False)
+        self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
 
     def get_news(self, keyword="", limit=1, start_position = 0, status=True):
         if(keyword == ""):
             sql = f"SELECT * FROM news ORDER BY date LIMIT {start_position}, {limit}"
         else:
-            sql = f"SELECT * FROM news WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
+            #sql = f"SELECT * FROM news WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
+            sql = f"SELECT * FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
+            
         
         with self.connection:
             # ТУТ нужно оценить настроение новости

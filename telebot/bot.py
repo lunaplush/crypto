@@ -117,9 +117,13 @@ def get_news(keyword, limit, start_position):
     news = db.get_news(keyword, limit, start_position)
     strNews = f'<b>{keyword}</b>\n-------------------------\n'
     for snews in news:
-        strNews+= datetime.utcfromtimestamp(int(snews[3])/1000).strftime('%d.%m.%Y %H:%M') + f" ({snews[5]})" +'\n'
-        strNews+= snews[1] + '\n\n'
-    strNews = strNews.replace('&nbsp;', ' ')
+        #print(snews["title"])
+        
+        strNews+= datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M') + f" ({snews['source']})" +'\n'
+        strNews+= snews["title"] + '\n'
+        strNews+= f"&#128550; = {snews['negative']}   &#128528; = {snews['neutral']}   &#128522; = {snews['positive']}\n\n"
+        
+    #strNews = strNews.replace('&nbsp;', ' ')
     return strNews
 
 
