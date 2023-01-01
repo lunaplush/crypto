@@ -31,8 +31,8 @@ forecast = get_forecast(symbol, date=datetime.datetime.now())
 
 
 model_name = "tf_idf"
-keyword = "btc"
-limit = 10
+keyword = ""
+limit = 1000
 start_position = 0
 
 db = SQLighter(config.PATH_TO_DB)
@@ -63,8 +63,7 @@ for snews in news:
     objData['neutral'] = data[1]
     objData['positive'] = data[2]
     print(objData)
-"""
+
     sql = f"INSERT OR IGNORE INTO {model_name} VALUES('{objData['url']}', {objData['negative']}, {objData['neutral']}, {objData['positive']})"
     result = db.insertRow(sql)
     print(result)
-"""
