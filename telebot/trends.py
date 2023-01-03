@@ -3,6 +3,8 @@ import pandas as pd
 import datetime as dt
 #import pandas_datareader as pdr
 import yfinance as yf
+import matplotlib
+matplotlib.use('Agg')
 
 
 #now = dt.datetime.now()
@@ -21,5 +23,6 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
     #print(df.head())
     #mpf.plot(df,type='candle',style='yahoo',savefig=filename)
     #mpf.plot(df, type='candle', style='yahoo', volume=True)
+    mpf
     mpf.plot(df, type='candle', volume=True, savefig='../data/trends/' + filename)
     return True
