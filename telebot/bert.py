@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 sys.path.append("..")
 
 import config
@@ -32,13 +33,15 @@ forecast = get_forecast(symbol, date=datetime.datetime.now())
 
 model_name = "bert"
 keyword = "btc"
-limit = 10
+limit = 3000
 start_position = 0
 
 db = SQLighter(config.PATH_TO_DB)
 sql = f"SELECT * FROM news AS n LEFT JOIN {model_name} AS b ON n.url=b.url WHERE b.url IS NULL LIMIT {start_position}, {limit}"
 news = db.query(sql)
 #print(news)
+
+start = time.time()
 
 sentiment = Sentiment()
 
@@ -73,3 +76,6 @@ for snews in news:
 
 #print(data)
 #db.insertData(data)
+end = time.time()
+duration = end - start
+print(duration)

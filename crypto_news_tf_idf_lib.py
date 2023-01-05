@@ -76,7 +76,7 @@ class Sentiment():
 
 if __name__ == "__main__":
     sentiment = Sentiment()
-    news = "There is positive news about bitcoin"
+    news = "BTC shows the rise"
     time_start = time.time()
     a = sentiment.do_sentiment_analysis(news)
     print(a)
