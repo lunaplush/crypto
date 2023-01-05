@@ -107,12 +107,13 @@ def command_news(message):
 #news ==============================================
 def getNewsMenu():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    print('news_count:' + str(news_count))
-    print('NEWS_LIMIT:' + str(NEWS_LIMIT))
+    #print('news_count:' + str(news_count))
+    #print('NEWS_LIMIT:' + str(NEWS_LIMIT))
+    print(f"start_position:{str(start_position)} / news_count:{str(news_count)} / NEWS_LIMIT:{str(NEWS_LIMIT)}")
 
-    if(start_position > 0 & news_count == NEWS_LIMIT):
+    if((start_position > 0) & (news_count == NEWS_LIMIT)):
         markup.add('/prev10', '/next10', '/lastnews')
-    elif(start_position > 0 & news_count < NEWS_LIMIT):
+    elif((start_position > 0) & (news_count < NEWS_LIMIT)):
         markup.add('/prev10', '/lastnews')
     else:
         markup.add('/next10', '/lastnews')
