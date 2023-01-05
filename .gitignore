@@ -69,4 +69,6 @@ Thumbs.db
 
 /data/trends/*.png
 
+/temp
+
 *.csv
