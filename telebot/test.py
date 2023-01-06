@@ -26,18 +26,19 @@ def calculateNewsSentiment(newsData):
     negative, neutral, positive = float(newsData['negative']), float(newsData['neutral']), float(newsData['positive'])
     print(type(negative))
     print(f"Negative: {negative} / Neutral: {neutral} / Positive: {positive}")
-    if (float(negative) > float(positive)):
-        return 'Negative'
-    elif (float(positive) < float(negative)):
-        return 'Positive'
-    else:
+    if neutral > 0.5:
         return 'Neutral'
-    
+    if negative > positive:
+        return 'Negative'
+    else:
+        return 'Positive'
+
 
 for snews in news:
     print(snews['title'])
     #print(f"Negative: {snews['negative']} / Neutral: {snews['neutral']} / Positive: {snews['positive']}")
     print(calculateNewsSentiment(snews))
+    pass
     #objData = {}
     #url = snews[0]
     #title = snews[1]
