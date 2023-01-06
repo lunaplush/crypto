@@ -2,7 +2,7 @@ import sys
 sys.path.append("..")
 
 import sqlite3
-from crypto_news_tf_idf_lib import Sentiment
+#from crypto_news_tf_idf_lib import Sentiment
 
 
 
@@ -15,7 +15,7 @@ class SQLighter:
         self.cursor = self.connection.cursor()
 
 
-
+    """
     def get_news(self, keyword="", limit=1, start_position = 0, status=True):
         if(keyword == ""):
             sql = f"SELECT * FROM news ORDER BY date LIMIT {start_position}, {limit}"
@@ -31,7 +31,7 @@ class SQLighter:
             result = self.cursor.execute(sql).fetchall()
             #print(result)
             return result
-
+    
 
 
     def getNewsCount(self, keyword=""):
@@ -46,12 +46,12 @@ class SQLighter:
             #print(result.keys())
             return result['cnt']
 
-
+    """
 
 
     def query(self, sql):      
         with self.connection:
-            return self.cursor.execute(sql).fetchall()
+            return self.cursor.execute(sql)
 
     """
     def insertData(self, data):

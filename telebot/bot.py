@@ -12,6 +12,8 @@ sys.path.append("..")
 import config
 import dateconterter
 import trends
+from news import News
+import dateconterter as dc
 
 #from time_series_prediction_lib import Forecast
 from time_series_prediction_lib import get_forecast, Forecast
@@ -189,10 +191,12 @@ def send_news_prev(message):
 def get_news(keyword, limit, start_position):
     #print("start_position:" + str(start_position))
     keyword = keyword.upper()
-    newsCount = db.getNewsCount(keyword)
+    #newsCount = db.getNewsCount(keyword)
+    newsCount = News.getNewsCount(db, keyword)
     #print("newsCount:"+str(newsCount))
 
-    news = db.get_news(keyword, limit, start_position)
+    #news = db.get_news(keyword, limit, start_position)
+    news =  News.getNewsByKeyword(db=db, keyword=keyword, limit=limit, start_position=start_position)
 
     global news_count
     news_count = len(news)
@@ -317,6 +321,22 @@ def command_news(message):
         photo = open(forecast.path_figure, 'rb')
         bot.send_photo(message.chat.id, photo)
         bot.send_message(message.chat.id, forecast.get_forecast_data_formatted())
+
+        dd = dc.getDates("-5d", type="timestamp")
+        dateStart = dd['dateStart']
+        dateEnd = dd['dateEnd']
+        keyword = asset
+        start_position = 0
+        #db = SQLighter(config.PATH_TO_DB)
+        news = News.getNewsByKeyword(db=db, keyword=keyword, start_position=start_position, dateStart=dateStart, dateEnd=dateEnd)
+        #print(news)
+        newsSentiment = News.getNewsSentiment(news)
+        strForcastSentiment = f"&#128550; = {newsSentiment['negative']}   &#128528; = {newsSentiment['neutral']}   &#128522; = {newsSentiment['positive']}\n\n"
+        #print(newsSentiment)
+        bot.send_message(message.chat.id, strForcastSentiment)
+
+        #pass
+
     else:
         bot.send_message(message.chat.id, 'There is no prediction... Sorry')
 
