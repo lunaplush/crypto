@@ -4,6 +4,9 @@ sys.path.append("..")
 import sqlite3
 from crypto_news_tf_idf_lib import Sentiment
 
+
+
+
 class SQLighter:
 
     def __init__(self, database_file):
@@ -16,8 +19,7 @@ class SQLighter:
             sql = f"SELECT * FROM news ORDER BY date LIMIT {start_position}, {limit}"
         else:
             #sql = f"SELECT * FROM news WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
-            sql = f"SELECT * FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
-            
+            sql = f"SELECT title, date, negative, neutral, positive FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE title LIKE ('%{keyword} %') OR title LIKE (' %{keyword} %') OR title LIKE (' %{keyword}%') GROUP BY title ORDER BY date DESC LIMIT {start_position}, {limit}"
         
         with self.connection:
             # ТУТ нужно оценить настроение новости
@@ -27,6 +29,21 @@ class SQLighter:
             result = self.cursor.execute(sql).fetchall()
             #print(result)
             return result
+
+
+
+    def getNewsCount(self, keyword=""):
+        if(keyword == ""):
+            sql = "SELECT COUNT(*) FROM news"
+        else:
+            #SELECT COUNT(*) FROM (SELECT title FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE title LIKE ('% XMR%') OR title LIKE (' %XMR %') OR title LIKE (' %XRM%') GROUP BY title ORDER BY date DESC)
+            sql = f"SELECT COUNT(*) as cnt FROM (SELECT title FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE title LIKE ('%{keyword} %') OR title LIKE (' %{keyword} %') OR title LIKE (' %{keyword}%') GROUP BY title ORDER BY date DESC)"
+
+        with self.connection:
+            result = self.cursor.execute(sql).fetchone()
+            #print(result.keys())
+            return result['cnt']
+
 
 
 

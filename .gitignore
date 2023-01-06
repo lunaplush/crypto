@@ -53,13 +53,22 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-*.png
+
 
 
 # environment file
 .env
 
 
-*.sqlite
-*.json
+/db/*.sqlite
+/db/*.sqlite-shm
+/db/*.sqlite-wal
+
+/data/forecasts/*.png
+/data/forecasts/*.json
+
+/data/trends/*.png
+
+/temp
+
 *.csv
