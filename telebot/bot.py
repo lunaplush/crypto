@@ -305,7 +305,7 @@ def command_news(message):
     symbol = asset+"-USD"
     bot.send_message(message.chat.id, 'Wait a minute...')
     start_time = time.time()
-    forecast = get_forecast(symbol, date=datetime.now(), time_reduce=False)
+    forecast = get_forecast(symbol, date=datetime.now(), time_reduce=True)
     print("Прогоз занял {}".format(time.time()-start_time))
     if forecast is not None:
         #print(forecast.path_figure)

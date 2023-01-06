@@ -17,6 +17,7 @@ from prophet.plot import plot as plot_prophet
 from prophet.diagnostics import cross_validation, performance_metrics
 
 
+
 import crypto_data_lib
 import crypto_data_lib
 
@@ -163,7 +164,8 @@ def search_optimal_parameters(df):
     return best_params
 
 
-def make_prophet_model(symbol, time_reduce=False):
+
+def make_prophet_model_old(symbol, time_reduce=False):
     try:
         symbol = symbol.lower()
         df_raw = crypto_data_lib.get_yahoo(symbol)
@@ -181,7 +183,8 @@ def make_prophet_model(symbol, time_reduce=False):
     except:
         return None
 
-def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time_reduce=False):
+
+def get_forecast_old(symbol="btc-usd", date=datetime.datetime.now(), period=14, time_reduce=False):
     try:
         symbol = symbol.lower()
         forecast = Forecast(symbol=symbol, date=date)
@@ -214,6 +217,137 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
         return forecast
     except Exception:
         return None
+
+def make_prophet_model(symbol, time_reduce=False):
+    try:
+        interval = 90
+        symbol = symbol.lower()
+        period = crypto_data_lib.Period(datetime.datetime.now() - datetime.timedelta(interval), datetime.datetime.now())
+        df_raw = crypto_data_lib.get_yahoo(symbol, period)
+        print(df_raw.head())
+
+        if sum(df_raw["Adj Close"] < 1) == 0:
+            df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
+            log_flag = True
+        else:
+            log_flag = False
+        df_raw.reset_index(inplace=True)
+        df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
+        #if time_reduce:
+        if True:
+            model = Prophet(n_changepoints=15, changepoint_range=0.92)
+            model.fit(df)
+        else:
+            good_params = search_optimal_parameters(df)
+            model = Prophet(**good_params).fit(df)
+        # model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
+        return model, log_flag
+    except Exception as exp:
+        print(exp)
+        return None
+def add_zero(x):
+    if x<10:
+        return "0"+str(x)
+    else:
+        return str(x)
+
+def plot_forecast(forecast, dologflag, model, symbol):
+    try:
+        df = model.history
+        date_forecast_begin = df.ds.iloc[-1] + datetime.timedelta(1)
+        fig, ax = plt.subplots(1, 1, figsize = (12,8))
+        date_begin_formatted = "{}.{}.{}".format(add_zero(date_forecast_begin.day), add_zero(date_forecast_begin.month), date_forecast_begin.year)
+        fig.suptitle("Прогноз курса {}-USD с {} на ближайшие две недели. ".format(symbol.upper(),
+                                                                                  date_begin_formatted),
+                     fontsize=18)
+
+        fig.set_constrained_layout("constrained")
+       # fig.set_title("Прогноз")
+        if dologflag:
+            forecast["yhat_v"] = np.power(np.e, forecast.yhat)
+            forecast["yhat_lower_v"] = np.power(np.e, forecast.yhat_lower)
+            forecast["yhat_upper_v"] = np.power(np.e, forecast.yhat_upper)
+            forecast["trend_v"] = np.power(np.e, forecast.trend)
+        else:
+            forecast["yhat_v"] = forecast.yhat
+            forecast["yhat_lower_v"] = forecast.yhat_lower
+            forecast["yhat_upper_v"] = forecast.yhat_upper
+            forecast["trend_v"] = forecast.trend
+
+
+
+
+        if dologflag:
+            ax.plot(df.ds, np.power(np.e, df["y"]), label="История за предыдущие 90 дней")
+        else:
+             ax.plot(df.ds, df["y"], label="История за предыдущие 90 дней")
+        ax.plot(forecast.ds.iloc[-14:], forecast.yhat_v.iloc[-14:], color="r", label="Прогноз")
+        ax.fill_between(forecast.ds.iloc[-14:], forecast.yhat_lower_v.iloc[-14:], forecast.yhat_upper_v.iloc[-14:],
+                        color="#FFAAAA", label ="Возможные отклонения от прогнозных значений")
+        ax.plot(forecast.ds.iloc[-14:], forecast.trend_v.iloc[-14:], color="#9900AA", label="Тренд")
+        ax.grid(True, color='#828282', linewidth=0.8, linestyle='--')
+        ax.grid(which="minor", color="#AAAAAA", linewidth=0.4, linestyle=":")
+
+        n = len(forecast.ds)
+        step = 10
+        ax.minorticks_on()
+        tick1 = forecast.ds[0:n:step]
+        lb = ["{}-{}-{}".format(add_zero(a.day), add_zero(a.month), a.year) for a in tick1]
+        ax.set_xticks(tick1, lb, rotation="vertical", fontsize=14)
+        ax.legend(loc='upper left', fontsize=14)
+        for labels in ax.get_yticklabels():
+            labels.set_fontsize(14)
+            ax.set_ylabel("Цена {} в долларах".format(symbol.upper()), fontsize=16)
+        return fig
+    except Exception as e:
+        print("plot forecast : ", e)
+
+
+def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time_reduce=False):
+    try:
+        symbol = symbol.lower()
+        forecast = Forecast(symbol=symbol, date=date)
+        print("forecast.get_path_model()  - ", forecast.get_path_model())
+        if not(os.path.isfile(forecast.get_path_model())):
+            model, log_flag = make_prophet_model(symbol, time_reduce)
+            if model is None:
+                print("Model not created after make_prophet_model")
+                return None
+            else:
+               with open(forecast.get_path_model(), "w") as f:
+                    print("Write new model to {}".format(forecast.get_path_model()))
+                    f.write(model_to_json(model))
+        else:
+            print("is File")
+            with open(forecast.get_path_model(), "r") as f:
+                model = model_from_json(f.read())
+                if sum(model.history.y < 0) == 0:
+                    log_flag = True
+                else:
+                    log_flag = False
+
+            print("Get model from json {}".format(forecast.get_path_model()))
+
+
+        future = model.make_future_dataframe(periods=period)
+        forecast_do = model.predict(future)
+
+        #model.plot(forecast_do)
+        fig = plot_forecast(forecast_do, log_flag, model, symbol)
+        print("Did model.plot")
+        result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
+        result.set_index("ds", inplace=True)
+        if log_flag:
+            for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
+                result[cl] = np.power(np.e, result[cl])
+
+        fig.savefig(forecast.path_figure, format="png")
+        forecast.add_forecast_data(result)
+        return forecast
+    except Exception as e:
+        print("In get forecast ", e)
+        return None
+
 
 if __name__ == "__main__":
     # df = crypto_data_lib.open_data("data/BTCUSDT_1d_1502928000000-1664668800000_86400000_1873.csv")
@@ -249,7 +383,7 @@ if __name__ == "__main__":
         forecast = get_forecast(symbol="btc-usd", date=datetime.datetime.now())
         forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now())
     else:
-        forecast = get_forecast(symbol="eth-usd", date=datetime.datetime.now(), time_reduce=True)
+        forecast = get_forecast(symbol="BTC-usd", date=datetime.datetime.now(), time_reduce=True)
         print(forecast.get_path_figure())
 
     print(str(forecast.get_forecast_data_formatted()))
