@@ -3,7 +3,8 @@ import pandas as pd
 import datetime as dt
 #import pandas_datareader as pdr
 import yfinance as yf
-
+import matplotlib
+matplotlib.use('Agg')
 
 #now = dt.datetime.now()
 #start = now - dt.timedelta(60)
