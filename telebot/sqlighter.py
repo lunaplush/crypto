@@ -14,6 +14,8 @@ class SQLighter:
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
 
+
+
     def get_news(self, keyword="", limit=1, start_position = 0, status=True):
         if(keyword == ""):
             sql = f"SELECT * FROM news ORDER BY date LIMIT {start_position}, {limit}"

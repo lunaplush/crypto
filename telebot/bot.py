@@ -87,7 +87,7 @@ def assetSelectMenu():
 
 def assetMainMenu():
     start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    start_markup.add('/trends', '/news', '/forcast')
+    start_markup.row('/trends', '/news', '/forcast', '/test')
     start_markup.row('/start')
     return start_markup
 
@@ -154,12 +154,14 @@ def command_news(message):
     news = get_news(asset, NEWS_LIMIT, start_position)
     bot.send_message(message.chat.id, news, reply_markup=getNewsMenu())
 
+
 def send_news(message):
     global keyword
     keyword = message.text.strip()
     news = get_news(keyword, NEWS_LIMIT, start_position)
     #start_position = start_position + NEWS_LIMIT
     bot.send_message(message.chat.id, news, reply_markup=getNewsMenu())
+
 
 def send_news_next(message):
     #keyword = message.text.strip()
@@ -185,12 +187,13 @@ def send_news_prev(message):
 
 
 def get_news(keyword, limit, start_position):
-    print("start_position:" + str(start_position))
-    keyword = keyword.upper();
+    #print("start_position:" + str(start_position))
+    keyword = keyword.upper()
     newsCount = db.getNewsCount(keyword)
     #print("newsCount:"+str(newsCount))
 
     news = db.get_news(keyword, limit, start_position)
+
     global news_count
     news_count = len(news)
     #print(len(news))
@@ -286,6 +289,7 @@ def command_news(message):
 
 
 #forcast ==========================================
+"""
 def getForcastMenu():
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add('/wo_news', '/w_news')
@@ -297,9 +301,10 @@ def getForcastMenu():
 def command_forcast(message):
     global asset
     bot.send_message(message.chat.id, 'Select forcast type', reply_markup=getForcastMenu())
+"""
 
-
-@bot.message_handler(commands=['wo_news'])
+#@bot.message_handler(commands=['wo_news'])
+@bot.message_handler(commands=['forcast'])
 def command_news(message):
     global asset
     symbol = asset+"-USD"
@@ -317,8 +322,11 @@ def command_news(message):
 
 
 
+
+
+
 @bot.message_handler(content_types='text')
 def text_input(message):
-    bot.send_message(message.chat.id, f"Дорогой {message.from_user.first_name}, для этой кнопки действие еще не прописано!")
+    bot.send_message(message.chat.id, f"Дорогой или дорогая {message.from_user.first_name}, для этой кнопки действие еще не прописано!")
 
 bot.infinity_polling()
