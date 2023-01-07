@@ -32,7 +32,7 @@ forecast = get_forecast(symbol, date=datetime.datetime.now())
 
 model_name = "tf_idf"
 keyword = ""
-limit = 10
+limit = 1000
 start_position = 0
 
 db = SQLighter(config.PATH_TO_DB)
