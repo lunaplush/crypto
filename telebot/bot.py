@@ -89,7 +89,7 @@ def assetSelectMenu():
 
 def assetMainMenu():
     start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    start_markup.row('/trends', '/news', '/forcast', '/test')
+    start_markup.row('/trends', '/news', '/forcast')
     start_markup.row('/start')
     return start_markup
 
