@@ -322,6 +322,8 @@ def command_news(message):
         bot.send_photo(message.chat.id, photo)
         bot.send_message(message.chat.id, forecast.get_forecast_data_formatted())
 
+
+
         dd = dc.getDates("-5d", type="timestamp")
         dateStart = dd['dateStart']
         dateEnd = dd['dateEnd']

@@ -257,7 +257,7 @@ def plot_forecast(forecast, dologflag, model, symbol):
         date_forecast_begin = df.ds.iloc[-1] + datetime.timedelta(1)
         fig, ax = plt.subplots(1, 1, figsize = (12,8))
         date_begin_formatted = "{}.{}.{}".format(add_zero(date_forecast_begin.day), add_zero(date_forecast_begin.month), date_forecast_begin.year)
-        fig.suptitle("Прогноз курса {}-USD с {} на ближайшие две недели. ".format(symbol.upper(),
+        fig.suptitle("Прогноз курса {} с {} на ближайшие две недели. ".format(symbol.upper(),
                                                                                   date_begin_formatted),
                      fontsize=18)
 
