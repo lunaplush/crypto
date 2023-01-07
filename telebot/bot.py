@@ -38,11 +38,11 @@ def getMainMenu():
 
 assets = {
     'btc' : 'Bitcoin',
-    'eth' : 'Etherium',
+    'eth' : 'Ethereum',
     'ltc' : 'Litecoin',
     'bnb' : 'Binance Coin',
     'xmr' : 'Monero',
-    'atom' : 'Atom'
+    'atom' : 'Atom',
 }
 
 
@@ -208,7 +208,7 @@ def get_news(keyword, limit, start_position):
         #strNews+= datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M') + f" ({snews['source']})" +'\n'
         strNews+=  f"<b>{dateStr}</b>"+'\n'
         strNews+= snews["title"] + '\n'
-        strNews+= f"&#128550; = {snews['negative']}   &#128528; = {snews['neutral']}   &#128522; = {snews['positive']}\n\n"
+        strNews+= f"&#128550; = {snews['negative']}%   &#128528; = {snews['neutral']}%   &#128522; = {snews['positive']}%\n\n"
         
     #strNews = strNews.replace('&nbsp;', ' ')
     return strNews
@@ -333,7 +333,16 @@ def command_news(message):
         news = News.getNewsByKeyword(db=db, keyword=keyword, start_position=start_position, dateStart=dateStart, dateEnd=dateEnd)
         #print(news)
         newsSentiment = News.getNewsSentiment(news)
-        strForcastSentiment = f"&#128550; = {newsSentiment['negative']}   &#128528; = {newsSentiment['neutral']}   &#128522; = {newsSentiment['positive']}\n\n"
+        periodSentiment = "Новостной фон настроен "
+        if newsSentiment['negative'] > newsSentiment['positive']:
+            periodSentiment+= "по медвежьи"
+        elif newsSentiment['negative'] < newsSentiment['positive']:
+            periodSentiment+= "по бычьи"
+        else:
+            periodSentiment+= "нейтрально"
+
+        strForcastSentiment = f"&#128550; = {newsSentiment['negative']}%  &#128528; = {newsSentiment['neutral']}%   &#128522; = {newsSentiment['positive']}%\n\n"
+        strForcastSentiment+= f"{periodSentiment}"
         #print(newsSentiment)
         bot.send_message(message.chat.id, strForcastSentiment)
 

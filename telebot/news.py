@@ -53,7 +53,13 @@ class News:
         }
         for item in data:
             dictionary[item] = dictionary.get(item, 0) + 1
+        print(dictionary)
             
+        sum = dictionary['negative'] + dictionary['neutral'] + dictionary['positive']
+        print("sum:" + str(sum))
+        if(sum != 0):
+            for sent in dictionary:
+                dictionary[sent] = round((100 / sum) * dictionary[sent], 0)
         #print(dictionary)
         return dictionary
 
