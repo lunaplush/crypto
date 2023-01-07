@@ -208,7 +208,7 @@ def get_news(keyword, limit, start_position):
         #strNews+= datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M') + f" ({snews['source']})" +'\n'
         strNews+=  f"<b>{dateStr}</b>"+'\n'
         strNews+= snews["title"] + '\n'
-        strNews+= f"&#128550; = {snews['negative']}%   &#128528; = {snews['neutral']}%   &#128522; = {snews['positive']}%\n\n"
+        strNews+= f"&#128550; = {snews['negative']}   &#128528; = {snews['neutral']}   &#128522; = {snews['positive']}\n\n"
         
     #strNews = strNews.replace('&nbsp;', ' ')
     return strNews
