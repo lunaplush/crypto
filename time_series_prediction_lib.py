@@ -44,10 +44,10 @@ class Forecast:
         if hasattr(self, "df"):
             forecast_text = "Прогноз на 14 дней :\n"
             for i in self.df.index:
-                forecast_text += "{} курс будет около {:d}, но не меньше {:d} " \
-                                 "и не больше {:d}".format(i.strftime("%d-%m-%Y"), int(self.df.loc[i]["yhat"]),
-                                                           int(self.df.loc[i]["yhat_lower"]),
-                                                           int(self.df.loc[i]["yhat_upper"]))+"\n"
+                forecast_text += "{} курс будет около {}, но не меньше {} " \
+                                 "и не больше {}".format(i.strftime("%d-%m-%Y"), round(self.df.loc[i]["yhat"], 3),
+                                                           round(self.df.loc[i]["yhat_lower"], 3),
+                                                           round(self.df.loc[i]["yhat_upper"]), 3)+"\n"
             return forecast_text
         else:
             pd.DataFrame()

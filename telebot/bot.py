@@ -37,12 +37,12 @@ def getMainMenu():
 """
 
 assets = {
-    'btc' : 'Bitcoin',
-    'eth' : 'Ethereum',
-    'ltc' : 'Litecoin',
-    'bnb' : 'Binance Coin',
-    'xmr' : 'Monero',
-    'atom' : 'Atom',
+    'btc': 'Bitcoin',
+    'eth': 'Ethereum',
+    'ltc': 'Litecoin',
+    'bnb': 'Binance Coin',
+    'xmr': 'Monero',
+    'atom': 'Atom',
 }
 
 
