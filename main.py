@@ -206,17 +206,19 @@ class mainApp(QMainWindow):
         self.view_prediction_result()
 
     def doArima(self):
-        resVisual = QVBoxLayout()
-        self.frame.setLayout(resVisual)
-        self.figure2 = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
-        self.canvas2 = FigureCanvas(self.figure2)
-        resVisual.addWidget(self.canvas2)
-        self.ax2 = self.figure2.subplots(1, 1)
-        ts = time_series_prediction_lib.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
-        #ts.plot_arima(ts, self.ax)
-        ts.plot_arima(ts, self.ax2)
-        self.ax.figure.canvas.draw()
-        self.ax2.figure.canvas.draw()
+
+        # resVisual = QVBoxLayout()
+        # self.frLayout(resVisual)
+        # self.figure2 = plt.figure(figsize=(20, 20), facecolor="#FFFFFF")
+        # self.canvas2 = FigureCanvas(self.figure2)
+        # resVisual.addWidget(self.canvas2)
+        # self.ax2 = self.figure2.subplots(1, 1)
+        # ts = time_series_prediction_lib.TimeSeriesPrediction(self.df[self.period.begin:self.period.end])
+        # # #ts.plot_arima(ts, self.ax)
+        # ts.plot_arima(ts, self.ax2)
+        # self.ax.figure.canvas.draw()
+        # # self.ax2.figure.canvas.draw()
+        pass
 
     def doPrediction(self):
         pass

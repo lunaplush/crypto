@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import re
 
 
-def getDates(dateShift):
+def getDates(dateShift, type="date"):
     print(dateShift)
     dsign = {
         "-": -1,
@@ -23,10 +23,16 @@ def getDates(dateShift):
     dateEnd = datetime.now()
     dateStart = dateEnd + td[de]
 
-    dd = {
-        'dateStart': formatDate(dateStart),
-        'dateEnd': formatDate(dateEnd)
-    }
+    if (type == "date"):
+        dd = {
+            'dateStart': formatDate(dateStart),
+            'dateEnd': formatDate(dateEnd)
+        }
+    else:
+        dd = {
+            'dateStart': int(dateStart.timestamp())*1000,
+            'dateEnd': int(dateEnd.timestamp())*1000
+        } 
     
     return dd
     #td = timedelta()

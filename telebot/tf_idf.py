@@ -32,15 +32,15 @@ forecast = get_forecast(symbol, date=datetime.datetime.now())
 
 model_name = "tf_idf"
 keyword = ""
-limit = 10000
+limit = 1000
 start_position = 0
 
 db = SQLighter(config.PATH_TO_DB)
 sql = f"SELECT * FROM news AS n LEFT JOIN {model_name} AS b ON n.url=b.url WHERE b.url IS NULL LIMIT {start_position}, {limit}"
-news = db.query(sql)
+news = db.query(sql).fetchall()
 #print(news)
 
-sentiment = Sentiment()
+#sentiment = Sentiment()
 
 for snews in news:
     objData = {}
