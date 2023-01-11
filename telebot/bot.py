@@ -2,8 +2,9 @@ import os
 import time
 
 import telebot
-from telebot import types
+from telebot import types, apihelper
 from sqlighter import SQLighter
+from sessionmanager import SessionManager
 from datetime import datetime, timedelta
 
 import sys
@@ -18,7 +19,7 @@ import dateconterter as dc
 #from time_series_prediction_lib import Forecast
 from time_series_prediction_lib import get_forecast, Forecast
 
-
+apihelper.ENABLE_MIDDLEWARE = True
 
 
 NEWS_LIMIT = 10
@@ -28,6 +29,7 @@ new_count = NEWS_LIMIT
 
 bot = telebot.TeleBot(config.TOKEN, parse_mode='HTML')
 db = SQLighter(config.PATH_TO_DB)
+sm = SessionManager(path_to_db=config.PATH_TO_SM_DB)
 
 """
 def getMainMenu():
@@ -46,6 +48,15 @@ assets = {
 }
 
 
+
+@bot.middleware_handler(update_types=['message'])
+def modify_message(bot_instance, message):
+    # modifying the message before it reaches any other handler 
+    #message.another_text = message.text + ':changed'
+    #print(f"middleware:{message.chat.id}")
+    sm.setUserId(message.chat.id)
+
+
 @bot.message_handler(commands=['start'])
 def command_start(message):
     #start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -54,6 +65,7 @@ def command_start(message):
     bot.send_message(message.chat.id, f'Hello {message.chat.username}')
     #asset = bot.send_message(message.chat.id, "Enter asset name (BTC, ETH, XRP)", reply_markup=types.ReplyKeyboardRemove())
     asset = bot.send_message(message.chat.id, "Select asset from list", reply_markup=assetSelectMenu())
+    #asset = bot.send_message(message.chat.id, "Select asset from list", reply_markup=test_menu())
     bot.register_next_step_handler(asset, select_action)
 
 
@@ -62,12 +74,31 @@ def command_start(message):
     bot.send_message(message.chat.id, 'Select action', reply_markup=assetMainMenu())
 
 
+
+
+
+def test_menu():
+    start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    start_markup.row('/test')
+    start_markup.row('/start')
+    return start_markup
+
+
+
+
 def select_action(message):
-    global asset
+    #global asset
     global start_position
     asset = message.text.strip()
     start_position = 0
     if assets.get(asset) != None:
+        
+
+
+        #sm.setUserId(message.chat.id)
+        sm.set("asset", asset)
+
+
         bot.send_message(message.chat.id, f'<b>{asset}</b> has been selected', reply_markup=assetMainMenu())
     else:
         #bot.send_message(message.chat.id, "The asset code doesn't match, please select asset from the list below")
@@ -89,7 +120,7 @@ def assetSelectMenu():
 
 def assetMainMenu():
     start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    start_markup.row('/trends', '/news', '/forcast')
+    start_markup.row('/trends', '/news', '/forcast', '/test')
     start_markup.row('/start')
     return start_markup
 
@@ -103,6 +134,23 @@ def command_news(message):
     sent = bot.send_message(message.chat.id, "Enter keyword")
     bot.register_next_step_handler(sent, send_news)
 """
+
+
+
+
+
+
+
+#test ==============================================
+@bot.message_handler(commands=['test'])
+def test(message):
+    #sm.setUserId(message.chat.id)
+    asset = sm.get(name="asset")
+    #print(f"asset:{asset}")
+    bot.send_message(message.chat.id, str(asset))
+
+
+
 
 
 
@@ -136,9 +184,9 @@ def prev10(message):
 
 @bot.message_handler(commands=['lastnews'])
 def lastnews(message):
-    global asset
+    #global asset
     global start_position
-
+    asset = sm.get("asset")
     start_position = 0
 
     news = get_news(asset, NEWS_LIMIT, start_position)
@@ -150,7 +198,8 @@ def lastnews(message):
 @bot.message_handler(commands=['news'])
 def command_news(message):
     global start_position
-    global asset
+    #global asset
+    asset = sm.get("asset")
     #start_position = start_position + NEWS_LIMIT
     start_position = 0
     news = get_news(asset, NEWS_LIMIT, start_position)
@@ -167,8 +216,9 @@ def send_news(message):
 
 def send_news_next(message):
     #keyword = message.text.strip()
-    global asset
+    #global asset
     global start_position
+    asset = sm.get("asset")
     start_position = start_position + NEWS_LIMIT
     news = get_news(asset, NEWS_LIMIT, start_position)
     #start_position = start_position + NEWS_LIMIT
@@ -177,9 +227,10 @@ def send_news_next(message):
 
 def send_news_prev(message):
     #keyword = message.text.strip()
-    global asset
+    #global asset
     global start_position
-
+    asset = sm.get("asset")
+    
     if start_position > 0:
         start_position = start_position - NEWS_LIMIT
 
@@ -229,7 +280,8 @@ def command_news(message):
 
 @bot.message_handler(commands=['7d'])
 def command_news(message):
-    global asset
+    #global asset
+    asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
 
     dd = dateconterter.getDates("-7d")
@@ -245,7 +297,8 @@ def command_news(message):
 
 @bot.message_handler(commands=['1m'])
 def command_news(message):
-    global asset
+    #global asset
+    asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
 
     dd = dateconterter.getDates("-1m")
@@ -260,7 +313,8 @@ def command_news(message):
 
 @bot.message_handler(commands=['1y'])
 def command_news(message):
-    global asset
+    #global asset
+    asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
 
     dd = dateconterter.getDates("-1y")
@@ -275,7 +329,8 @@ def command_news(message):
 
 @bot.message_handler(commands=['allTime'])
 def command_news(message):
-    global asset
+    #global asset
+    asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
 
     dd = {
@@ -310,7 +365,8 @@ def command_forcast(message):
 #@bot.message_handler(commands=['wo_news'])
 @bot.message_handler(commands=['forcast'])
 def command_news(message):
-    global asset
+    #global asset
+    asset = sm.get("asset")
     symbol = asset+"-USD"
     bot.send_message(message.chat.id, 'Wait a minute...')
     start_time = time.time()

@@ -1,6 +1,8 @@
 import sys
 sys.path.append("..")
 
+import os
+
 import sqlite3
 #from crypto_news_tf_idf_lib import Sentiment
 
@@ -14,6 +16,7 @@ class SQLighter:
         self.connection.row_factory = sqlite3.Row
         self.cursor = self.connection.cursor()
 
+    # maybe function isDbExists should be here
 
     """
     def get_news(self, keyword="", limit=1, start_position = 0, status=True):
@@ -47,11 +50,33 @@ class SQLighter:
             return result['cnt']
 
     """
+    def isTableExists(self, tableName):
+        sql = f"SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}';"
+        result = self.query(sql).fetchone()
+        print(result)
+        if result == None:
+            return False
+        else:
+            return True
 
 
     def query(self, sql):      
         with self.connection:
             return self.cursor.execute(sql)
+
+
+    def execute(self, sql):
+        try:
+            #print(sql)
+            self.cursor.execute(sql)
+            #print(f"Result:{res.fetchone()}")
+            self.connection.commit()
+            #print(f"Commit:{com}")
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
 
     """
     def insertData(self, data):

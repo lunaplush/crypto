@@ -4,10 +4,6 @@ import datetime as dt
 #import pandas_datareader as pdr
 import yfinance as yf
 import matplotlib
-<<<<<<< HEAD
-
-=======
->>>>>>> d238dfa07d6c5ce426d0d0f39e0414424814221f
 matplotlib.use('Agg')
 
 
