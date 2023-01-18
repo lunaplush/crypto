@@ -1,3 +1,4 @@
+#Here will be great refactoring
 import numpy as np
 import pandas as pd
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, qApp, QMessageBox, QTableView, QVBoxLayout
