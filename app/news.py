@@ -1,16 +1,18 @@
-from sqlighter import SQLighter
+#from .sqlighter import SQLighter
+import config
 
 class News:
     def __init__(self) -> None:
         pass
 
 
-    def getNewsByKeyword(db, keyword="", dateStart=None, dateEnd=None, limit=10, start_position=0, status=True):
+    def getNewsByKeyword(db, keyword="", dateStart=None, dateEnd=None, limit=config.NEWS_LIMIT_PER_PAGE, start_position=0, status=True):
         if limit is None:
             sql_limit = ""
         else:
             sql_limit = f" LIMIT {start_position}, {limit}"
         
+
         if dateStart is not None and dateEnd is not None:
             sql_where_date = f"date>={dateStart} AND date<={dateEnd}"
         elif dateStart is not None and dateEnd is None:
@@ -29,9 +31,9 @@ class News:
         else:
             if sql_where_date == "":
                 #sql = f"SELECT * FROM news WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
-                sql = f"SELECT title, date, negative, neutral, positive FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE title LIKE ('%{keyword} %') OR title LIKE (' %{keyword} %') OR title LIKE (' %{keyword}%') GROUP BY title ORDER BY date DESC {sql_limit}"
+                sql = f"SELECT title, n.url, date, negative, neutral, positive FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE title LIKE ('%{keyword} %') OR title LIKE (' %{keyword} %') OR title LIKE (' %{keyword}%') GROUP BY title ORDER BY date DESC {sql_limit}"
             else:
-                sql = f"SELECT title, date, negative, neutral, positive FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE (title LIKE ('%{keyword} %') OR title LIKE (' %{keyword} %') OR title LIKE (' %{keyword}%')) AND {sql_where_date} GROUP BY title ORDER BY date DESC {sql_limit}"
+                sql = f"SELECT title, n.url, date, negative, neutral, positive FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE (title LIKE ('%{keyword} %') OR title LIKE (' %{keyword} %') OR title LIKE (' %{keyword}%')) AND {sql_where_date} GROUP BY title ORDER BY date DESC {sql_limit}"
         print(sql)
         return db.query(sql).fetchall()
 
