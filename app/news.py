@@ -25,9 +25,9 @@ class News:
 
         if(keyword == ""):
             if sql_where_date == "":
-                sql = f"SELECT * FROM news ORDER BY date {sql_limit}"
+                sql = f"SELECT title, n.url, date, negative, neutral, positive FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url ORDER BY date {sql_limit}"
             else:
-                sql = f"SELECT * FROM news WHERE {sql_where_date} ORDER BY date {sql_limit}"
+                sql = f"SELECT title, n.url, date, negative, neutral, positive FROM news AS n INNER JOIN tf_idf AS t ON n.url=t.url WHERE {sql_where_date} ORDER BY date {sql_limit}"
         else:
             if sql_where_date == "":
                 #sql = f"SELECT * FROM news WHERE title LIKE ('%{keyword}%') ORDER BY date DESC LIMIT {start_position}, {limit}"
