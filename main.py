@@ -20,7 +20,7 @@ import time_series_prediction_lib
 
 class PdTable(QAbstractTableModel):
     def __init__(self, data):
-        super(QAbstractTableModel, self).__init__()
+        super(PdTable, self).__init__()
         self._data = data
 
     def rowCount(self, parent=None):

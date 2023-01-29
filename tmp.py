@@ -29,6 +29,7 @@ from prophet.plot import plot_components_plotly, plot_plotly, plot_cross_validat
 from prophet.diagnostics import cross_validation, performance_metrics
 from prophet.serialize import model_to_json, model_from_json
 
+data = datetime.datetime(year=2022, month=10, day=10)
 
 warnings.filterwarnings("ignore")
 class ProphetModel():
@@ -121,7 +122,7 @@ future = model.make_future_dataframe(periods=predict_period)
 predict = model.predict(future)
 date_now = datetime.datetime.now()
 name= date_now.strftime("%Y%m%d") + ".json"
-with open(os.path.join("prophet_models", name), "w") as f:
+with open(os.path.join("data","models", name), "w") as f:
      f.write(model_to_json( model))
 
 #fig = plot_cross_validation_metric(df_cv, metric="mse")
