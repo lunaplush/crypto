@@ -35,6 +35,7 @@ onnx_output = []
 for n in news_list:
     inputs = tokenizer(n)
     input_feed = {"input_ids": np.array(inputs["input_ids"]).reshape(1, -1)}
+    print(input_feed)
     try:
         output = session.run(
             output_names=["output"],
