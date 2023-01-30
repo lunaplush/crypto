@@ -76,3 +76,6 @@ Thumbs.db
 bert.onnx
 
 /telebot/sm.sqlite
+
+*.sqlite-shm
+*.sqlite-wal

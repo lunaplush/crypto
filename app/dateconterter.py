@@ -46,3 +46,7 @@ def formatDate(dt):
 
 def strToDatetime(date_string, format_string = '%d.%m.%Y'):
     return datetime.strptime(date_string, format_string)
+
+
+def datetimeToTimestamp(datetime: datetime) -> int:
+    return int(datetime.timestamp())*1000
