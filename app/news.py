@@ -7,7 +7,7 @@ class News:
 
 
     def getNewsByKeyword(db, keyword="", dateStart=None, dateEnd=None, limit=config.NEWS_LIMIT_PER_PAGE, start_position=0, status=True):
-        if limit is None:
+        if limit is None or limit==0:
             sql_limit = ""
         else:
             sql_limit = f" LIMIT {start_position}, {limit}"
