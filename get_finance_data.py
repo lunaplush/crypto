@@ -8,7 +8,7 @@ import pandas as pd
 
 path = os.path.join("data", "data_finance")
 
-def update_data(ticker, base_path):
+def update_finance_data(ticker, base_path):
     if not os.path.exists(base_path):
         print(f"Не существует {base_path}. Создайте или измените путь")
     else:
@@ -50,7 +50,7 @@ if __name__ == "__main__":
                    "amzn", "tsla", "amd", "nvda", "intc"]
     #symbols =["intc"]
     for yfd in symbols:
-        update_data(yfd, path)
+        update_finance_data(yfd, path)
 
 
 #["btc-usd", "eth-usd", "ltc-usd", "bnb-usd", "xmr-usd", "atom-usd",
