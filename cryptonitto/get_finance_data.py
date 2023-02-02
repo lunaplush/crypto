@@ -6,7 +6,7 @@ import pytz
 import yfinance as yf
 import pandas as pd
 
-path = os.path.join("data", "data_finance")
+path = os.path.join( "data", "data_finance")
 
 def update_finance_data(ticker, base_path):
     if not os.path.exists(base_path):
@@ -44,6 +44,13 @@ def update_finance_data(ticker, base_path):
             df.to_csv(file_path)  #    Сохранить
 
 
+def get_finance_data1(ticker):
+    print("path ", path)
+    print("current  ", os.getcwd())
+    file_path = os.path.join(path, ticker+".csv")
+    df = pd.read_csv(file_path, parse_dates=["Date"], dtype={ "Open": np.float64, "Hight": np.float64,
+                                                "Low": np.float64, "Close": np.float64})
+    return df
 
 if __name__ == "__main__":
     symbols = ["btc-usd", "eth-usd", "ltc-usd", "bnb-usd", "xmr-usd", "atom-usd",

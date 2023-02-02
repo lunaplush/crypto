@@ -8,8 +8,10 @@ import ast
 from datetime import datetime, timedelta
 from cryptonitto.news import News
 
+
 search_keys = {"btc-usd": ["btc", "bitcoin"]}
-path = os.path.join("data", "data_news")
+
+path = os.path.join( "data", "data_news")
 days_before = 365
 
 def get_integral_news_info(ticker, date_work, keywords, day_number = 3):
@@ -21,6 +23,7 @@ def get_integral_news_info(ticker, date_work, keywords, day_number = 3):
     :param day_number: количество дней, по которым скачиваются новости для интегрального оценивания
     :return: pandas.Series ("negative", "positive", "neutral", "number" )
     """
+
     date_begin = int((date_work.replace(hour=0, minute=0, second=0)-timedelta(days=day_number-1)).timestamp() * 1000)
     date_end = int((date_work.replace(hour=23, minute=59, second=59).timestamp() * 1000))
     url = 'http://news.fvds.ru:5000/news'
@@ -53,6 +56,7 @@ def get_integral_news_info(ticker, date_work, keywords, day_number = 3):
         return None
 
 def update_news_sentiment_data(ticker, base_path, rebuild = False):
+
     if not os.path.exists(base_path):
         print(f"Не существует {base_path}. Создайте или измените путь")
     else:
