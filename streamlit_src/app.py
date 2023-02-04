@@ -1,13 +1,18 @@
+import datetime
+
 import streamlit as st
+from streamlit_plotly_events import plotly_events
 import matplotlib.pyplot as plt
+import plotly.express as px
 import os
 import sys
 
-#from cryptonitto import get_finance_data
+
 sys.path.append("/home/luna/Luna/Проекты/ML_system_design/crypto")
 
 import cryptonitto
-from cryptonitto.get_finance_data import get_finance_data1
+#from cryptonitto.get_finance_data import get_finance_data1
+#from cryptonitto.get_news_data import get_news_for_day, search_keys
 import matplotlib
 from utils import get_project_root
 import numpy as np
@@ -43,11 +48,29 @@ def run_app():
 
     st.text(symbol)
     df_symbol = get_finance_data1(symbol)
-    fig, ax = plt.subplots(1,1)
-    ax.set_title(symbol)
 
-    ax.plot(df_symbol.Date, df_symbol.Open)
+    #matplotlib
+    # fig, ax = plt.subplots(1,1)
+    # ax.set_title(symbol)
+    # ax.plot(df_symbol.Date, df_symbol.Open)
+
+    #plotly
+    fig = px.line(df_symbol, x="Date", y="Open", title=symbol)
     st.plotly_chart(fig)
+    selected_points =plotly_events(fig)
+    if len(selected_points) > 0:
+        d = selected_points[0]["x"]
+        st.text(d)
+        date_work = datetime.datetime.strptime(d, "%Y-%m-%d")
+        st.text(f"Новости для даты {date_work}")
+        if symbol in search_keys:
+            keys = search_keys[symbol]
+        else:
+            keys = [symbol.split(sep="-")[0]]
+        list_news = get_news_for_day(symbol, date_work, keys)
+        for n in list_news:
+            st.text(n)
+
 
 
 
@@ -56,4 +79,5 @@ def run_app():
 
 
 if __name__ == "__main__":
+    print(sys.path)
     run_app()

@@ -2,7 +2,7 @@ import numpy as np
 
 import pandas as pd
 import pytz
-import os
+import os, sys
 import requests
 import ast
 from datetime import datetime, timedelta
@@ -11,8 +11,32 @@ from cryptonitto.news import News
 
 search_keys = {"btc-usd": ["btc", "bitcoin"]}
 
-path = os.path.join( "data", "data_news")
+sys.path.append("~/Luna/Проекты/ML_system_design/crypto")
+path = os.path.join("..", "data", "data_news")
+#НУЖНО ДОБавить путь к проекту для streamlit
+
+
 days_before = 365
+
+def get_news_for_day(ticker, date_work, keywords, day_number = 3):
+    date_begin = int((date_work.replace(hour=0, minute=0, second=0)-timedelta(days=day_number-1)).timestamp() * 1000)
+    date_end = int((date_work.replace(hour=23, minute=59, second=59).timestamp() * 1000))
+    url = 'http://news.fvds.ru:5000/news'
+    news_list = []
+    for keyword in keywords:
+        params = {
+            'keyword': keyword,
+            'date_start': date_begin,
+            'date_end': date_end,
+            'limit': 0
+        }
+        headers = {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+        }
+        response = requests.get(url, headers=headers, params=params)
+        news_list += ast.literal_eval(response.content.decode(encoding=response.apparent_encoding))
+    return news_list
 
 def get_integral_news_info(ticker, date_work, keywords, day_number = 3):
     """
@@ -102,8 +126,8 @@ def update_news_sentiment_data(ticker, base_path, rebuild = False):
 
 if __name__ == "__main__":
     symbols = ["btc-usd", "eth-usd", "ltc-usd", "bnb-usd", "xmr-usd", "atom-usd"]
-    symbols = ["btc-usd"]
-    symbols = ["eth-usd", "ltc-usd", "bnb-usd", "xmr-usd", "atom-usd"]
+    #symbols = ["btc-usd"]
+
 
 
     for ticker in symbols:
