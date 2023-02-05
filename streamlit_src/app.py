@@ -8,10 +8,8 @@ import os
 import sys
 
 
-sys.path.append("/home/luna/Luna/Проекты/ML_system_design/crypto")
-
 import cryptonitto
-#from cryptonitto.get_finance_data import get_finance_data1
+from cryptonitto import finance
 #from cryptonitto.get_news_data import get_news_for_day, search_keys
 import matplotlib
 from utils import get_project_root

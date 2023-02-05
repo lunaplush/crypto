@@ -1,5 +1,63 @@
+import pandas as pd
+import numpy as np
+import ast
+from datetime import timedelta
+from cryptonitto import fastapi
 
 
+def get_from_file(file_path):
+    """
+    Функция возвращает DataFrame с данными из репозитория с csv
+    :param file_path: путь к файлу
+    :return:
+    """
+    df = pd.read_csv(file_path, dtype={"number": np.intc, "negative": np.intc,
+                                "positive": np.intc, "negative": np.intc},
+                      parse_dates=["Date"]
+                     )
+    return df
+
+
+def get_integral_news_info(symbol, date_work, keywords, day_number=3):
+    """
+    Функция возваращает интегральную характеристику настроеня новостей для одной даты
+    :param symbol: идентификатор криптовалют соотвествует именм  в yahoo finance
+    :param date_work: дата, для которой считается оценка новостей
+    :param keywords: ключевые словая, по которым выбираются новости из базы данных
+    :param day_number: количество дней, по которым скачиваются новости для интегрального оценивания
+    :return: pandas.Series ("negative", "positive", "neutral", "number" )
+    """
+
+    date_begin = int((date_work.replace(hour=0, minute=0, second=0)-timedelta(days=day_number-1)).timestamp() * 1000)
+    date_end = int((date_work.replace(hour=23, minute=59, second=59).timestamp() * 1000))
+
+    news_list = []
+    for keyword in keywords:
+        response = fastapi.git_list_news(keyword, date_begin, date_end)
+        news_list += ast.literal_eval(response.content.decode(encoding=response.apparent_encoding))
+    print(f"--{symbol} --- Found {len(news_list)} news for {date_work}--")
+
+    if len(news_list) > 0:
+        sentiment = News.getNewsSentiment(news_list)
+
+        line = pd.Series(name=date_work.replace(hour=0, minute=0, second=0, microsecond=0),
+                         data={"number": len(news_list), "negative": sentiment["negative"],
+                               "neutral": sentiment["neutral"],
+                               "positive": sentiment["positive"]}
+                         )
+        return line
+    else:
+        return None
+
+def get_news_for_day(symbol, date_work, keywords, day_number = 3):
+    date_begin = int((date_work.replace(hour=0, minute=0, second=0)-timedelta(days=day_number-1)).timestamp() * 1000)
+    date_end = int((date_work.replace(hour=23, minute=59, second=59).timestamp() * 1000))
+
+    news_list = []
+    for keyword in keywords:
+        responce = fastapi.git_list_news(keyword,date_begin, date_end)
+        news_list += ast.literal_eval(responce.content.decode(encoding=responce.apparent_encoding))
+    return news_list
 
 
 class News:
