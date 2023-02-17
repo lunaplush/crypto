@@ -1,4 +1,6 @@
 import datetime
+
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 import sys
@@ -15,6 +17,7 @@ import matplotlib
 import requests
 import ast
 
+
 def run_app():
     print(sys.path)
     st.title("Criptonitto analysys")
@@ -27,12 +30,43 @@ def run_app():
         st.sidebar.markdown("## https://t.me/cryptonitto_bot")
         symbol = st.sidebar.selectbox("Криптовалюта:", params.symbols)
         st.text(symbol)
-        df_symbol = finance.get_from_file(os.path.join(params.data_repository, "data_finance",symbol+".csv"))
 
+        df_symbol = finance.get_from_file(os.path.join(params.data_repository, "data_finance", symbol+".csv"))
+        df_symbol_for_date = df_symbol.set_index("Date")
+
+        date_begin = st.sidebar.date_input(label="C", value=df_symbol.Date.min(), min_value=df_symbol.Date.min(), max_value=df_symbol.Date.max())
+        date_end = st.sidebar.date_input(label="по", value=df_symbol.Date.max(), min_value=df_symbol.Date.min(), max_value=df_symbol.Date.max())
+        date_begin = datetime.date(year=2022, month=11, day=1)
+        df_symbol = df_symbol_for_date[date_begin: date_end].reset_index()
+
+
+
+        path_news = os.path.join(params.data_repository, "data_news", symbol+"_news.csv")
+        print(path_news)
+        if (os.path.exists(path_news)):
+            fig, ax = plt.subplots(4, 1, sharex=True, figsize=(10,5))
+            df_news = news.get_from_file(path_news).set_index("Date")[date_begin: date_end].reset_index()
+            ax[2].get_shared_x_axes().join(ax[1], ax[2])
+
+            ax[2].plot(df_news.Date, df_news.number)
+            ax[3].plot(df_news.Date, df_news.positive, color="green")
+            ax[3].plot(df_news.Date, df_news.negative, color="red")
+
+
+
+        else:
+            fig, ax = plt.subplots(2, 1)
+
+
+        ax[0].plot(df_symbol.Date, df_symbol.Open)
+        ax[1].bar(df_symbol.Date, df_symbol.Volume)
+
+
+        st.plotly_chart(fig)
         #plotly
         fig = px.line(df_symbol, x="Date", y="Open", title=symbol)
         #st.plotly_chart(fig)
-        selected_points =plotly_events(fig)
+        selected_points = plotly_events(fig)
         if len(selected_points) > 0:
             d = selected_points[0]["x"]
             st.text(d)

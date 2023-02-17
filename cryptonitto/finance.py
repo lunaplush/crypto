@@ -21,7 +21,7 @@ def get_from_file(file_path):
 
 def add_to_file(file_path, symbol, begin, end):
     add_df = yf.download(symbol, begin, end)
-    if len(add_df)>0:
+    if len(add_df) > 0:
         add_df.index = add_df.index.tz_localize(tz=pytz.UTC)
         for i in add_df.index:
             if i < begin:
@@ -34,4 +34,4 @@ def add_to_file(file_path, symbol, begin, end):
         else:
             print(f"Exist file {symbol} is up to date")
     else:
-        print(f"For {symbol} is no data")
+        print(f"For {symbol} is no data for peroiod {begin}-{end}")
