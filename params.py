@@ -9,6 +9,7 @@ symbols = ["btc-usd", "eth-usd", "ltc-usd", "bnb-usd", "xmr-usd", "atom-usd",
                    "amzn", "tsla", "amd", "nvda", "intc",
            "bmt.de", "tef.mc", "mbg.de"
            ]
+
 symbols_news = ["btc-usd", "eth-usd", "ltc-usd", "bnb-usd", "xmr-usd", "atom-usd"]
 
 #Ключевые слова для поиска в базе новостей
