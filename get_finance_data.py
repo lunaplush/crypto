@@ -39,7 +39,7 @@ def update_finance_data(symbol, base_path):
             begin = df.Date.max() + datetime.timedelta(1)
             end = datetime.datetime.now(tz=pytz.UTC) - datetime.timedelta(1)
             if begin < end:
-               finance.add_to_file(file_path, begin, end)
+               finance.add_to_file(file_path, symbol, begin, end)
             else:
                 print(f"Exist file {symbol} is up to date")
 
