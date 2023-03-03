@@ -5,14 +5,6 @@ import datetime as dt
 import yfinance as yf
 import matplotlib
 matplotlib.use('Agg')
-import logging
-logger3 = logging.getLogger(__name__)
-logger3.setLevel(logging.INFO)
-# настройка обработчика и форматировщика для logger2
-handler3 = logging.FileHandler(f"{__name__}.log", mode='w')
-# добавление обработчика к логгеру
-logger3.addHandler(handler3)
-logger3.info(f"Testing the custom logger for module {__name__}...")
 
 #now = dt.datetime.now()
 #start = now - dt.timedelta(60)
@@ -52,9 +44,9 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
 
     #df = pdr.get_data_yahoo(stock, start , now)
     #df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
-    logger3.info(f"dateStart {dateStart} - dateEnd {dateEnd}")
+
     df = yf.download(symbol, dateStart, dateEnd)
-    logger3.info(f"df {df.head(3)}")
+
 
     #print(df.head())
     #mpf.plot(df,type='candle',style='yahoo',savefig=filename)
