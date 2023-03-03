@@ -7,12 +7,12 @@ import yfinance as yf
 import matplotlib
 matplotlib.use('Agg')
 import logging
-# logger3 = logging.getLogger(__name__)
-# handler3 = logging.FileHandler(f"{__name__}.log", mode='w')
-# handler3.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s"))
-# logger3.addHandler(handler3)
-# logger3.setLevel(logging.INFO)
-# logger3.info("Testing logger in trends.py")
+logger3 = logging.getLogger(__name__)
+handler3 = logging.FileHandler(f"{__name__}.log", mode='w')
+handler3.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s"))
+logger3.addHandler(handler3)
+logger3.setLevel(logging.INFO)
+logger3.info("Testing logger in trends.py")
 
 #now = dt.datetime.now()
 #start = now - dt.timedelta(60)
@@ -52,12 +52,12 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
 
     #df = pdr.get_data_yahoo(stock, start , now)
     #df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
-    #logger3.info(f"Do yf.dowload {symbol}, {dateStart}, {dateEnd}")
-    #time_now = time.time()
+    logger3.info(f"Do yf.dowload {symbol}, {dateStart}, {dateEnd}")
+    time_now = time.time()
     df = yf.download(symbol, dateStart, dateEnd)
-    #logger3.info(F"We get data from yahoo in {time.time()-time_now} sec as df {df.head(2)}")
+    logger3.info(F"We get data from yahoo in {time.time()-time_now} sec as df {df.head(2)}")
 
-    #print(df.head())
+    print(df.head())
     #mpf.plot(df,type='candle',style='yahoo',savefig=filename)
     #mpf.plot(df, type='candle', style='yahoo', volume=True)
     #extra_plot  = mpf.make_addplot(df.loc[dateStart:, ["High","Low"]])
@@ -77,7 +77,7 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
     ]
 
     #logger3.info(f" Befor plot")
-    mpf.plot(df, type='candle', volume=True, figsize=(12, 8), addplot=macd_plot, figratio=(4,3), style="yahoo", tight_layout=True, title=f"{symbol}_{dateStart}-{dateEnd}", mav=(120), savefig='../data/trends/' + filename)
+    mpf.plot(df, type='candle', volume=True, figsize=(12, 8), addplot=macd_plot, figratio=(4, 3), style="yahoo", tight_layout=True, title=f"{symbol}_{dateStart}-{dateEnd}", mav=(120), savefig='../data/trends/' + filename)
     #mpf.plot(df, type='candle', volume=True, addplot=macd_plot)
     #logger3.info(f"After plot  result:{answ} df: {df.head(3)}")
     return True
