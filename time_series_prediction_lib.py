@@ -5,7 +5,7 @@ import logging
 import telebot
 
 logger2 = telebot.logger
-logger2.setLevel(logging.INFO)
+logger2.setLevel(logging.ERROR)
 handler2 = logging.FileHandler(f"{__name__}.log", mode='w')
 handler2.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s"))
 logger2.addHandler(handler2)
@@ -255,9 +255,9 @@ def make_prophet_model(symbol, time_reduce=False):
         # model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
         return model, log_flag
     except Exception as exp:
-        print(exp)
-        logger2.exception("Не получился прогноз")
+        logger2.exception("Ошибка генерации прогноза")
         return None
+
 def add_zero(x):
     if x<10:
         return "0"+str(x)
