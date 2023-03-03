@@ -3,7 +3,7 @@ import time
 import logging
 import telebot
 
-logging.basicConfig(filename="telebot_log.txt", filemode="a", level=logging.INFO,
+logging.basicConfig(filename="telebot.log", filemode="a", level=logging.INFO,
                     format="%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s")
 logger = telebot.logger
 logger.setLevel(logging.INFO)
@@ -291,7 +291,6 @@ def command_news(message):
     bot.send_message(message.chat.id, 'Wait a minute...')
     try:
         dd = dateconterter.getDates("-7d")
-        logger.info(f" dd = dateconterter.getDates {dd}")
         symbol = asset+"-USD"
         trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
         logger.info(f"trendImageFilename - {trendImageFilename}")
@@ -300,9 +299,11 @@ def command_news(message):
             trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
             logger.info("After getTrendImage")
             logger.info(f"Check file name {os.path.isfile('../data/trends/' + trendImageFilename)}")
-            logger.info(("After check file path"))
+
             if (os.path.isfile('../data/trends/' + trendImageFilename) == False):
                 logger.error("We still dont have image")
+                bot.send_message(message.chat.id, "Somthing wrong with trends... Sorry (2)")
+
             logger.info("After double check")
         photo = open('../data/trends/'+trendImageFilename, 'rb')
         bot.send_photo(message.chat.id, photo)

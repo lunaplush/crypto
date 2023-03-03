@@ -1,11 +1,13 @@
 #Библиотека для прогнозирования
 import datetime
 import logging
-logger2 = logging.getLogger(__name__)
+#logger2 = logging.getLogger(__name__)
+import telebot
+
+logger2 = telebot.logger
 logger2.setLevel(logging.INFO)
-# настройка обработчика и форматировщика для logger2
 handler2 = logging.FileHandler(f"{__name__}.log", mode='w')
-# добавление обработчика к логгеру
+handler2.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s"))
 logger2.addHandler(handler2)
 logger2.info(f"Testing the custom logger for module {__name__}...")
 import os
