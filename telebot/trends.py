@@ -1,17 +1,17 @@
 import mplfinance as mpf
 import pandas as pd
 import datetime as dt
+import time
 #import pandas_datareader as pdr
 import yfinance as yf
 import matplotlib
 matplotlib.use('Agg')
-# import logging
-# logger3 = logging.getLogger(__name__)
-# handler3 = logging.FileHandler(f"{__name__}.log", mode='w')
-# logger3.addHandler(handler3)
-# logger3.setLevel(logging.INFO)
-# print("trend.py logger3 ", logger3)
-# logger3.info("TEstin logger in trends.py")
+import logging
+logger3 = logging.getLogger(__name__)
+handler3 = logging.FileHandler(f"{__name__}.log", mode='w')
+logger3.addHandler(handler3)
+logger3.setLevel(logging.INFO)
+logger3.info("Testing logger in trends.py")
 
 #now = dt.datetime.now()
 #start = now - dt.timedelta(60)
@@ -51,9 +51,10 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
 
     #df = pdr.get_data_yahoo(stock, start , now)
     #df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
-
+    logger3.info(f"Do yf.dowload {symbol}, {dateStart}, {dateEnd}")
+    time_now = time.time()
     df = yf.download(symbol, dateStart, dateEnd)
-
+    logger3.info(F"We get data from yahoo in {time.time()-time_now} sec as df {df.head(2)}")
 
     #print(df.head())
     #mpf.plot(df,type='candle',style='yahoo',savefig=filename)
@@ -74,8 +75,8 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
         #mpf.make_addplot((stochastic[['%D', '%SD', 'UL', 'DL']]), ylim=[0, 100], panel=3, ylabel='Stoch (14,3)'),
     ]
 
-    #logger3.info(f" Befor plot")
+    logger3.info(f" Befor plot")
     answ = mpf.plot(df, type='candle', volume=True, figsize=(12, 8), addplot=macd_plot, figratio=(4,3), style="yahoo", tight_layout=True, title=f"{symbol}_{dateStart}-{dateEnd}", mav=(120), savefig='../data/trends/' + filename)
     #mpf.plot(df, type='candle', volume=True, addplot=macd_plot)
-    #logger3.info(f"After plot  result:{answ} df: {df.head(3)}")
+    logger3.info(f"After plot  result:{answ} df: {df.head(3)}")
     return True
