@@ -297,12 +297,15 @@ def command_news(message):
         trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
         logger.info(f"trendImageFilename - {trendImageFilename}")
         if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+            logger.info("We dont have image for trend. Do this")
             trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+            if (os.path.isfile('../data/trends/' + trendImageFilename) == False):
+                logger.error("We still dont have image")
 
         photo = open('../data/trends/'+trendImageFilename, 'rb')
         bot.send_photo(message.chat.id, photo)
     except Exception as e:
-        bot.send_message(message.chat.id, "Somthing wrong with trens... Sorry")
+        bot.send_message(message.chat.id, "Somthing wrong with trends... Sorry")
         logger.exception("Ошибка при подготовке графика тренда")
 
 
@@ -319,6 +322,8 @@ def command_news(message):
     trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_1m.png"
     if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
         trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+
+
     
     photo = open('../data/trends/'+trendImageFilename, 'rb')
     bot.send_photo(message.chat.id, photo)
