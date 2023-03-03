@@ -292,8 +292,10 @@ def command_news(message):
     bot.send_message(message.chat.id, 'Wait a minute...')
     try:
         dd = dateconterter.getDates("-7d")
+        logger.info(f" dd = dateconterter.getDates {dd}")
         symbol = asset+"-USD"
         trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
+        logger.info(f"trendImageFilename - {trendImageFilename}")
         if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
             trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
 

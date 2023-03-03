@@ -319,7 +319,11 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
         forecast = Forecast(symbol=symbol, date=date)
         print("forecast.get_path_model()  - ", forecast.get_path_model())
         if not(os.path.isfile(forecast.get_path_model())):
-            model, log_flag = make_prophet_model(symbol, time_reduce)
+            logger2.info(f"time reduce {time_reduce}")
+            try:
+                model, log_flag = make_prophet_model(symbol, time_reduce)
+            except Exception as e:
+                logger2.exception("Somthing wrong in make_prophet_model")
             if model is None:
                 print("Model not created after make_prophet_model")
                 return None
