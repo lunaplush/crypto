@@ -124,7 +124,6 @@ def assetSelectMenu():
 
 
 
-
 def assetMainMenu():
     start_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     start_markup.row('/trends', '/news', '/forcast', '/test')
@@ -299,17 +298,17 @@ def command_news(message):
         if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
             logger.info("We dont have image for trend. Do this")
             trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+            logger.info("After getTrendImage")
+            logger.info(f"Check file name {os.path.isfile('../data/trends/' + trendImageFilename)}")
+            logger.info(("After check file path"))
             if (os.path.isfile('../data/trends/' + trendImageFilename) == False):
                 logger.error("We still dont have image")
-
+            logger.info("After double check")
         photo = open('../data/trends/'+trendImageFilename, 'rb')
         bot.send_photo(message.chat.id, photo)
     except Exception as e:
         bot.send_message(message.chat.id, "Somthing wrong with trends... Sorry")
         logger.exception("Ошибка при подготовке графика тренда")
-
-
-
 
 @bot.message_handler(commands=['1m'])
 def command_news(message):
