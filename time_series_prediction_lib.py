@@ -254,6 +254,7 @@ def make_prophet_model(symbol, time_reduce=False):
         return model, log_flag
     except Exception as exp:
         print(exp)
+        logger2.exception("Не получился прогноз")
         return None
 def add_zero(x):
     if x<10:
@@ -324,6 +325,7 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
                 model, log_flag = make_prophet_model(symbol, time_reduce)
             except Exception as e:
                 logger2.exception("Somthing wrong in make_prophet_model")
+                return None
             if model is None:
                 print("Model not created after make_prophet_model")
                 return None
