@@ -324,7 +324,7 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
             try:
                 model, log_flag = make_prophet_model(symbol, time_reduce)
             except Exception as e:
-                logger2.exception("Somthing wrong in make_prophet_model")
+                logger2.exception("Somthing wrong in make_prophet_model ")
                 return None
             if model is None:
                 print("Model not created after make_prophet_model")
