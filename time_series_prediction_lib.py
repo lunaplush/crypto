@@ -1,5 +1,13 @@
 #Библиотека для прогнозирования
 import datetime
+import logging
+logger2 = logging.getLogger(__name__)
+logger2.setLevel(logging.INFO)
+# настройка обработчика и форматировщика для logger2
+handler2 = logging.FileHandler(f"{__name__}.log", mode='w')
+# добавление обработчика к логгеру
+logger2.addHandler(handler2)
+logger2.info(f"Testing the custom logger for module {__name__}...")
 import os
 import itertools
 
@@ -330,24 +338,30 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
 
             print("Get model from json {}".format(forecast.get_path_model()))
 
+        try:
 
-        future = model.make_future_dataframe(periods=period)
-        forecast_do = model.predict(future)
+            future = model.make_future_dataframe(periods=period)
+            forecast_do = model.predict(future)
 
-        #model.plot(forecast_do)
-        fig = plot_forecast(forecast_do, log_flag, model, symbol)
-        print("Did model.plot")
-        result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
-        result.set_index("ds", inplace=True)
-        if log_flag:
-            for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
-                result[cl] = np.power(np.e, result[cl])
+            #model.plot(forecast_do)
+            fig = plot_forecast(forecast_do, log_flag, model, symbol)
+            print("Did model.plot")
+            result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
+            result.set_index("ds", inplace=True)
+            if log_flag:
+                for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
+                    result[cl] = np.power(np.e, result[cl])
 
-        fig.savefig(forecast.path_figure, format="png")
-        forecast.add_forecast_data(result)
+            fig.savefig(forecast.path_figure, format="png")
+            forecast.add_forecast_data(result)
+            logger2.info("Прогноз успешно сформирован")
+        except Exception as e:
+            forecast = None
+            logger2.exception("Ошибка в прорисовке графика прогноза")
         return forecast
     except Exception as e:
         print("In get forecast ", e)
+        logger2.exception("In get forecast ")
         return None
 
 

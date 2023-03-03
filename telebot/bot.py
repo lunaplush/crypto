@@ -1,7 +1,14 @@
 import os
 import time
-
+import logging
 import telebot
+
+logging.basicConfig(filename="telebot_log.txt", filemode="a", level=logging.INFO,
+                    format="%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s")
+logger = telebot.logger
+logger.setLevel(logging.INFO)
+
+
 from telebot import types, apihelper
 from sqlighter import SQLighter
 from sessionmanager import SessionManager
@@ -257,9 +264,9 @@ def get_news(keyword, limit, start_position):
         #print(snews["title"])
         dateStr = datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M')
         #strNews+= datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M') + f" ({snews['source']})" +'\n'
-        strNews+=  f"<b>{dateStr}</b>"+'\n'
-        strNews+= snews["title"] + '\n'
-        strNews+= f"&#128550; = {snews['negative']}   &#128528; = {snews['neutral']}   &#128522; = {snews['positive']}\n\n"
+        strNews +=  f"<b>{dateStr}</b>"+'\n'
+        strNews += snews["title"] + '\n'
+        strNews += f"&#128550; = {snews['negative']}   &#128528; = {snews['neutral']}   &#128522; = {snews['positive']}\n\n"
         
     #strNews = strNews.replace('&nbsp;', ' ')
     return strNews
@@ -283,15 +290,19 @@ def command_news(message):
     #global asset
     asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
+    try:
+        dd = dateconterter.getDates("-7d")
+        symbol = asset+"-USD"
+        trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
+        if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+            trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
 
-    dd = dateconterter.getDates("-7d")
-    symbol = asset+"-USD"
-    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
-    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
-        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
-    
-    photo = open('../data/trends/'+trendImageFilename, 'rb')
-    bot.send_photo(message.chat.id, photo)
+        photo = open('../data/trends/'+trendImageFilename, 'rb')
+        bot.send_photo(message.chat.id, photo)
+    except Exception as e:
+        bot.send_message(message.chat.id, "Somthing wrong with trens... Sorry")
+        logger.exception("Ошибка при подготовке графика тренда")
+
 
 
 
@@ -370,16 +381,16 @@ def command_news(message):
     symbol = asset+"-USD"
     bot.send_message(message.chat.id, 'Wait a minute...')
     start_time = time.time()
+    logger.info("Сейчаc получим прогноз")
     forecast = get_forecast(symbol, date=datetime.now(), time_reduce=True)
     print("Прогоз занял {}".format(time.time()-start_time))
     if forecast is not None:
         #print(forecast.path_figure)
+        logger.info("Сейчас получим картинку")
         photo = open(forecast.path_figure, 'rb')
+        logger.info(f"Картинка в {type(photo)}{photo}")
         bot.send_photo(message.chat.id, photo)
         bot.send_message(message.chat.id, forecast.get_forecast_data_formatted())
-
-
-
         dd = dc.getDates("-5d", type="timestamp")
         dateStart = dd['dateStart']
         dateEnd = dd['dateEnd']
