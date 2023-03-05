@@ -26,7 +26,7 @@ def run_app():
     if not os.path.exists(path):
        st.title(f"Путь к репозиторию с данными неверный {path}")
     else:
-        st.sidebar.image(os.path.join("static", "logo_ods.png"))
+        #st.sidebar.image(os.path.join("static", "logo_ods.png"))
         st.sidebar.markdown("# Criptonitto")
         st.sidebar.markdown("## https://t.me/cryptonitto_bot")
         symbol = st.sidebar.selectbox("Криптовалюта:", params.symbols)
