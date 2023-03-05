@@ -8,7 +8,7 @@ class Zipper():
 
 
     @staticmethod
-    def zipFolder(src_folder, dst_folder, zip_filename, internal_folder = ''):
+    def zipFolder(src_folder, dst_folder, zip_filename, internal_folder=''):
         try:
             path_to_zipfile = os.path.join(dst_folder, zip_filename)
             zf = zipfile.ZipFile(path_to_zipfile, 'w')
@@ -23,12 +23,14 @@ class Zipper():
                     )
             zf.close()
             print(f'Zip file {zip_filename} has been created')
+            return True
         except Exception as e:
             print(e)
+            return False
 
 
     @staticmethod
-    def addToArchive(path_to_zipfile, src_folder, filelist = [], internal_folder = ''):
+    def addToArchive(path_to_zipfile, src_folder, filelist=[], internal_folder=''):
         try:
             zf = zipfile.ZipFile(path_to_zipfile, 'a', compression=zipfile.ZIP_DEFLATED)
             if len(filelist) == 0:
@@ -48,13 +50,15 @@ class Zipper():
 
             zf.close()
             print(f'Files have been added to archive')
+            return True
 
         except Exception as e:
             print(e)
+            return False
 
     
     @staticmethod
-    def addFileToArchiveFromVariable(path_to_zipfile, filename, filedata, internal_folder = ''):
+    def addFileToArchiveFromVariable(path_to_zipfile, filename, filedata, internal_folder=''):
         try:
             zf = zipfile.ZipFile(path_to_zipfile, 'a', compression=zipfile.ZIP_DEFLATED)
             zf.writestr(
@@ -63,9 +67,11 @@ class Zipper():
             )
             zf.close()
             print(f'Data have been adder via file {filename} to the archive')
+            return True
 
         except Exception as e:
             print(e)
+            return False
 
 
     @staticmethod
@@ -75,5 +81,10 @@ class Zipper():
             zf.extractall(dst_folder)
             zf.close()
             print(f'Archive was unziped')
+            return True
         except Exception as e:
-             print(e)
+            print(e)
+            return False
+
+if __name__ == "__main__":
+    pass
