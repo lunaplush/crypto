@@ -1,5 +1,15 @@
 #Библиотека для прогнозирования
 import datetime
+import logging
+#logger2 = logging.getLogger(__name__)
+import telebot
+
+logger2 = telebot.logger
+logger2.setLevel(logging.ERROR)
+handler2 = logging.FileHandler(f"{__name__}.log", mode='w')
+handler2.setFormatter(logging.Formatter("%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s"))
+logger2.addHandler(handler2)
+logger2.info(f"Testing the custom logger for module {__name__}...")
 import os
 import itertools
 
@@ -245,8 +255,9 @@ def make_prophet_model(symbol, time_reduce=False):
         # model = Prophet(changepoint_prior_scale=0.01, seasonality_prior_scale=7).fit(df)
         return model, log_flag
     except Exception as exp:
-        print(exp)
+        logger2.exception("Ошибка генерации прогноза")
         return None
+
 def add_zero(x):
     if x<10:
         return "0"+str(x)
@@ -311,7 +322,11 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
         forecast = Forecast(symbol=symbol, date=date)
         print("forecast.get_path_model()  - ", forecast.get_path_model())
         if not(os.path.isfile(forecast.get_path_model())):
-            model, log_flag = make_prophet_model(symbol, time_reduce)
+            try:
+                model, log_flag = make_prophet_model(symbol, time_reduce)
+            except Exception as e:
+                logger2.exception("Somthing wrong in make_prophet_model ")
+                return None
             if model is None:
                 print("Model not created after make_prophet_model")
                 return None
@@ -330,24 +345,30 @@ def get_forecast(symbol="btc-usd", date=datetime.datetime.now(), period=14, time
 
             print("Get model from json {}".format(forecast.get_path_model()))
 
+        try:
 
-        future = model.make_future_dataframe(periods=period)
-        forecast_do = model.predict(future)
+            future = model.make_future_dataframe(periods=period)
+            forecast_do = model.predict(future)
 
-        #model.plot(forecast_do)
-        fig = plot_forecast(forecast_do, log_flag, model, symbol)
-        print("Did model.plot")
-        result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
-        result.set_index("ds", inplace=True)
-        if log_flag:
-            for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
-                result[cl] = np.power(np.e, result[cl])
+            #model.plot(forecast_do)
+            fig = plot_forecast(forecast_do, log_flag, model, symbol)
+            print("Did model.plot")
+            result = forecast_do[-period:][["yhat_lower", "yhat", "yhat_upper", "ds"]]
+            result.set_index("ds", inplace=True)
+            if log_flag:
+                for cl in  ["yhat", "yhat_upper", "yhat_lower"]:
+                    result[cl] = np.power(np.e, result[cl])
 
-        fig.savefig(forecast.path_figure, format="png")
-        forecast.add_forecast_data(result)
+            fig.savefig(forecast.path_figure, format="png")
+            forecast.add_forecast_data(result)
+            logger2.info("Прогноз успешно сформирован")
+        except Exception as e:
+            forecast = None
+            logger2.exception("Ошибка в прорисовке графика прогноза")
         return forecast
     except Exception as e:
         print("In get forecast ", e)
+        logger2.exception("In get forecast ")
         return None
 
 

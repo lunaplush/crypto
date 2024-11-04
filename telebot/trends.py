@@ -1,10 +1,12 @@
 import mplfinance as mpf
 import pandas as pd
 import datetime as dt
+import time
 #import pandas_datareader as pdr
 import yfinance as yf
 import matplotlib
 matplotlib.use('Agg')
+
 
 
 #now = dt.datetime.now()
@@ -45,8 +47,12 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
 
     #df = pdr.get_data_yahoo(stock, start , now)
     #df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
+
     df = yf.download(symbol, dateStart, dateEnd)
-    #print(df.head())
+
+
+
+
     #mpf.plot(df,type='candle',style='yahoo',savefig=filename)
     #mpf.plot(df, type='candle', style='yahoo', volume=True)
     #extra_plot  = mpf.make_addplot(df.loc[dateStart:, ["High","Low"]])
@@ -65,7 +71,8 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
         #mpf.make_addplot((stochastic[['%D', '%SD', 'UL', 'DL']]), ylim=[0, 100], panel=3, ylabel='Stoch (14,3)'),
     ]
 
-    mpf.plot(df, type='candle', volume=True, figsize=(12, 8), addplot=macd_plot, figratio=(4,3), style="yahoo", tight_layout=True, title=f"{symbol}_{dateStart}-{dateEnd}", mav=(120), savefig='../data/trends/' + filename)
+
+    mpf.plot(df, type='candle', volume=True, figsize=(12, 8), addplot=macd_plot, figratio=(4, 3), style="yahoo", tight_layout=True, title=f"{symbol}_{dateStart}-{dateEnd}", mav=(120), savefig='../data/trends/' + filename)
     #mpf.plot(df, type='candle', volume=True, addplot=macd_plot)
-    
+
     return True

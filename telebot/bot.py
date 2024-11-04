@@ -1,7 +1,14 @@
 import os
 import time
-
+import logging
 import telebot
+
+logging.basicConfig(filename="telebot.log", filemode="w", level=logging.ERROR,
+                    format="%(asctime)s %(levelname)s [%(filename)s] [%(funcName)s] [%(lineno)d] %(message)s")
+logger = telebot.logger
+logger.setLevel(logging.INFO)
+
+
 from telebot import types, apihelper
 from sqlighter import SQLighter
 from sessionmanager import SessionManager
@@ -114,7 +121,6 @@ def assetSelectMenu():
         listButtons.append(types.KeyboardButton(assetCode))
     markup.add(*listButtons)
     return markup
-
 
 
 
@@ -257,9 +263,9 @@ def get_news(keyword, limit, start_position):
         #print(snews["title"])
         dateStr = datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M')
         #strNews+= datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M') + f" ({snews['source']})" +'\n'
-        strNews+=  f"<b>{dateStr}</b>"+'\n'
-        strNews+= snews["title"] + '\n'
-        strNews+= f"&#128550; = {snews['negative']}   &#128528; = {snews['neutral']}   &#128522; = {snews['positive']}\n\n"
+        strNews +=  f"<b>{dateStr}</b>"+'\n'
+        strNews += snews["title"] + '\n'
+        strNews += f"&#128550; = {snews['negative']}   &#128528; = {snews['neutral']}   &#128522; = {snews['positive']}\n\n"
         
     #strNews = strNews.replace('&nbsp;', ' ')
     return strNews
@@ -283,48 +289,52 @@ def command_news(message):
     #global asset
     asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
-
-    dd = dateconterter.getDates("-7d")
-    symbol = asset+"-USD"
-    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
-    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
-        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
-    
-    photo = open('../data/trends/'+trendImageFilename, 'rb')
-    bot.send_photo(message.chat.id, photo)
-
-
+    try:
+        dd = dateconterter.getDates("-7d")
+        symbol = asset+"-USD"
+        trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_7d.png"
+        if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+            trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+        photo = open('../data/trends/'+trendImageFilename, 'rb')
+        bot.send_photo(message.chat.id, photo)
+    except Exception as e:
+        bot.send_message(message.chat.id, "Somthing wrong with trends... Sorry")
+        logger.exception("Ошибка при подготовке графика тренда")
 
 @bot.message_handler(commands=['1m'])
 def command_news(message):
     #global asset
     asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
-
-    dd = dateconterter.getDates("-1m")
-    symbol = asset+"-USD"
-    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_1m.png"
-    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
-        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
-    
-    photo = open('../data/trends/'+trendImageFilename, 'rb')
-    bot.send_photo(message.chat.id, photo)
-
+    try:
+        dd = dateconterter.getDates("-1m")
+        symbol = asset+"-USD"
+        trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_1m.png"
+        if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+            trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
+        photo = open('../data/trends/'+trendImageFilename, 'rb')
+        bot.send_photo(message.chat.id, photo)
+    except Exception as e:
+            bot.send_message(message.chat.id, "Somthing wrong with trends... Sorry")
+            logger.exception("Ошибка при подготовке графика тренда")
 
 @bot.message_handler(commands=['1y'])
 def command_news(message):
     #global asset
     asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
+    try:
+        dd = dateconterter.getDates("-1y")
+        symbol = asset+"-USD"
+        trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_1y.png"
+        if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+            trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
 
-    dd = dateconterter.getDates("-1y")
-    symbol = asset+"-USD"
-    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_1y.png"
-    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
-        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
-    
-    photo = open('../data/trends/'+trendImageFilename, 'rb')
-    bot.send_photo(message.chat.id, photo)
+        photo = open('../data/trends/'+trendImageFilename, 'rb')
+        bot.send_photo(message.chat.id, photo)
+    except Exception as e:
+        bot.send_message(message.chat.id, "Somthing wrong with trends... Sorry")
+        logger.exception("Ошибка при подготовке графика тренда")
 
 
 @bot.message_handler(commands=['allTime'])
@@ -332,18 +342,21 @@ def command_news(message):
     #global asset
     asset = sm.get("asset")
     bot.send_message(message.chat.id, 'Wait a minute...')
+    try:
+        dd = {
+            'dateStart': '2005-01-01',
+            'dateEnd': dateconterter.formatDate(datetime.now())
+        }
+        symbol = asset+"-USD"
+        trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_alltime.png"
+        if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
+            trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
 
-    dd = {
-        'dateStart': '2005-01-01',
-        'dateEnd': dateconterter.formatDate(datetime.now())
-    }
-    symbol = asset+"-USD"
-    trendImageFilename = f"{symbol.lower()}_{dd['dateStart']}_{dd['dateEnd']}_alltime.png"
-    if(os.path.isfile('../data/trends/'+trendImageFilename) == False):
-        trends.getTrendImage(symbol, dd['dateStart'], dd['dateEnd'], trendImageFilename)
-    
-    photo = open('../data/trends/'+trendImageFilename, 'rb')
-    bot.send_photo(message.chat.id, photo)
+        photo = open('../data/trends/'+trendImageFilename, 'rb')
+        bot.send_photo(message.chat.id, photo)
+    except Exception as e:
+        bot.send_message(message.chat.id, "Somthing wrong with trends... Sorry")
+        logger.exception("Ошибка при подготовке графика тренда")
 
 
 
@@ -373,13 +386,9 @@ def command_news(message):
     forecast = get_forecast(symbol, date=datetime.now(), time_reduce=True)
     print("Прогоз занял {}".format(time.time()-start_time))
     if forecast is not None:
-        #print(forecast.path_figure)
         photo = open(forecast.path_figure, 'rb')
         bot.send_photo(message.chat.id, photo)
         bot.send_message(message.chat.id, forecast.get_forecast_data_formatted())
-
-
-
         dd = dc.getDates("-5d", type="timestamp")
         dateStart = dd['dateStart']
         dateEnd = dd['dateEnd']
@@ -406,10 +415,6 @@ def command_news(message):
 
     else:
         bot.send_message(message.chat.id, 'There is no prediction... Sorry')
-
-
-
-
 
 
 @bot.message_handler(content_types='text')
