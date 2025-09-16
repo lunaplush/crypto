@@ -143,10 +143,6 @@ def command_news(message):
 
 
 
-
-
-
-
 #test ==============================================
 @bot.message_handler(commands=['test'])
 def test(message):
@@ -154,9 +150,6 @@ def test(message):
     asset = sm.get(name="asset")
     #print(f"asset:{asset}")
     bot.send_message(message.chat.id, str(asset))
-
-
-
 
 
 

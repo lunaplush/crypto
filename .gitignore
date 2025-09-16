@@ -27,7 +27,7 @@ dist/
 .idea/
 
 # VS Code
-.vcode/
+.vscode/
 
 # Virtual Environment
 .venv/
@@ -79,3 +79,5 @@ bert.onnx
 
 *.sqlite-shm
 *.sqlite-wal
+
+*.sqlite

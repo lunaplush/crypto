@@ -7,6 +7,7 @@ import yfinance as yf
 import matplotlib
 matplotlib.use('Agg')
 
+# from app.utils import logger_decorator
 
 
 #now = dt.datetime.now()
@@ -37,7 +38,6 @@ def Stochastic(df, window, smooth_window):
     return stochastic
 
 
-
 def getTrendImage(symbol, dateStart, dateEnd, filename):
     #stock = "^GSPC" #S&P500
     #stock = "BTC-USD" #S&P500
@@ -49,7 +49,8 @@ def getTrendImage(symbol, dateStart, dateEnd, filename):
     #df = pdr.get_data_yahoo(symbol, dateStart , dateEnd)
 
     df = yf.download(symbol, dateStart, dateEnd)
-
+    # After yfinance update it returns new df structure with multiindex. Column 'Ticker' should be removed because mpf.plot doesn't understand multiindex format.
+    df.columns = df.columns.droplevel('Ticker')
 
 
 
