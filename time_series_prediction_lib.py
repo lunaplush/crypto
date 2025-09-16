@@ -236,15 +236,16 @@ def make_prophet_model(symbol, time_reduce=False):
         symbol = symbol.lower()
         period = crypto_data_lib.Period(datetime.datetime.now() - datetime.timedelta(interval), datetime.datetime.now())
         df_raw = crypto_data_lib.get_yahoo(symbol, period)
+        df_raw.columns = df_raw.columns.droplevel('Ticker')
         print(df_raw.head())
 
-        if sum(df_raw["Adj Close"] < 1) == 0:
-            df_raw["Adj Close"] = np.log(df_raw["Adj Close"])
+        if sum(df_raw["Close"] < 1) == 0:
+            df_raw["Close"] = np.log(df_raw["Close"])
             log_flag = True
         else:
             log_flag = False
         df_raw.reset_index(inplace=True)
-        df = df_raw.rename(columns={'Date': 'ds', 'Adj Close': 'y'})
+        df = df_raw.rename(columns={'Date': 'ds', 'Close': 'y'})
         #if time_reduce:
         if True:
             model = Prophet(n_changepoints=15, changepoint_range=0.92)
