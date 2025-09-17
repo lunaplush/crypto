@@ -1,10 +1,12 @@
 from sqlighter import SQLighter
 
+from app.utils import execution_time
+
 class News:
     def __init__(self) -> None:
         pass
 
-
+    @execution_time
     def getNewsByKeyword(db, keyword="", dateStart=None, dateEnd=None, limit=10, start_position=0, status=True):
         if limit is None:
             sql_limit = ""
@@ -75,7 +77,7 @@ class News:
         else:
             return 'positive'
 
-
+    @execution_time
     def getNewsCount(db, keyword=""):
         if(keyword == ""):
             sql = "SELECT COUNT(*) FROM news"

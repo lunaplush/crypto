@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.append("..")
+
 import time
 import logging
 import telebot
@@ -14,14 +17,14 @@ from sqlighter import SQLighter
 from sessionmanager import SessionManager
 from datetime import datetime, timedelta
 
-import sys
-sys.path.append("..")
+
 
 import config
 import dateconterter
 import trends
 from news import News
 import dateconterter as dc
+from app.utils import execution_time
 
 #from time_series_prediction_lib import Forecast
 from time_series_prediction_lib import get_forecast, Forecast
@@ -237,12 +240,12 @@ def send_news_prev(message):
     #start_position = start_position + NEWS_LIMIT
     bot.send_message(message.chat.id, news, reply_markup=getNewsMenu())
 
-
+@execution_time
 def get_news(keyword, limit, start_position):
     #print("start_position:" + str(start_position))
     keyword = keyword.upper()
-    #newsCount = db.getNewsCount(keyword)
-    newsCount = News.getNewsCount(db, keyword)
+    # newsCount = db.getNewsCount(keyword)
+    # newsCount = News.getNewsCount(db, keyword)
     #print("newsCount:"+str(newsCount))
 
     #news = db.get_news(keyword, limit, start_position)
@@ -251,7 +254,8 @@ def get_news(keyword, limit, start_position):
     global news_count
     news_count = len(news)
     #print(len(news))
-    strNews = f'<b>{keyword}</b>({newsCount})\n-------------------------\n'
+    # strNews = f'<b>{keyword}</b>({newsCount})\n-------------------------\n' 
+    strNews = ''
     for snews in news:
         #print(snews["title"])
         dateStr = datetime.utcfromtimestamp(int(snews["date"])/1000).strftime('%d.%m.%Y %H:%M')
